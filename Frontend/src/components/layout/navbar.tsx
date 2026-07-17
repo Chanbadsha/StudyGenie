@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { BookOpen, Menu, X } from 'lucide-react';
+import { BookOpen, Menu, X, LogOut, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
+import { useSession, useLogout } from '@/hooks/useAuth';
 
 const NAV_LINKS = [
   { href: ROUTES.home, label: 'Home' },
@@ -14,6 +15,8 @@ const NAV_LINKS = [
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { data: user } = useSession();
+  const logout = useLogout();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
@@ -39,16 +42,38 @@ function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
-          <Link href={ROUTES.login}>
-            <Button variant="ghost" size="sm">
-              Sign In
-            </Button>
-          </Link>
-          <Link href={ROUTES.register}>
-            <Button variant="primary" size="sm">
-              Get Started
-            </Button>
-          </Link>
+          {user ? (
+            <>
+              <Link href={ROUTES.dashboard}>
+                <Button variant="ghost" size="sm">
+                  <LayoutDashboard className="mr-1.5 size-4" />
+                  Dashboard
+                </Button>
+              </Link>
+              <Button
+                variant="outline"
+                size="sm"
+                isLoading={logout.isPending}
+                onClick={() => logout.mutate()}
+              >
+                <LogOut className="mr-1.5 size-4" />
+                Sign Out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link href={ROUTES.login}>
+                <Button variant="ghost" size="sm">
+                  Sign In
+                </Button>
+              </Link>
+              <Link href={ROUTES.register}>
+                <Button variant="primary" size="sm">
+                  Get Started
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
 
         <button
@@ -75,16 +100,40 @@ function Navbar() {
               </Link>
             ))}
             <div className="flex flex-col gap-2 pt-2">
-              <Link href={ROUTES.login} onClick={() => setIsMenuOpen(false)}>
-                <Button variant="ghost" size="sm" className="w-full">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href={ROUTES.register} onClick={() => setIsMenuOpen(false)}>
-                <Button variant="primary" size="sm" className="w-full">
-                  Get Started
-                </Button>
-              </Link>
+              {user ? (
+                <>
+                  <Link href={ROUTES.dashboard} onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="ghost" size="sm" className="w-full">
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    isLoading={logout.isPending}
+                    onClick={() => {
+                      logout.mutate();
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link href={ROUTES.login} onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="ghost" size="sm" className="w-full">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link href={ROUTES.register} onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="primary" size="sm" className="w-full">
+                      Get Started
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

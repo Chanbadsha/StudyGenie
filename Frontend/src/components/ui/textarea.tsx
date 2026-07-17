@@ -1,5 +1,6 @@
 import { forwardRef } from 'react';
 import { TextField, Label, TextArea as HeroTextArea } from '@heroui/react';
+import type { ChangeEvent } from 'react';
 
 interface TextareaProps {
   label?: string;
@@ -8,7 +9,8 @@ interface TextareaProps {
   className?: string;
   value?: string;
   defaultValue?: string;
-  onChange?: (value: string) => void;
+  onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void;
+  onBlur?: (e: ChangeEvent<HTMLTextAreaElement>) => void;
   isDisabled?: boolean;
   isReadOnly?: boolean;
   isRequired?: boolean;
@@ -18,7 +20,7 @@ interface TextareaProps {
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   function Textarea(
-    { label, error, placeholder, className, isDisabled, isReadOnly, isRequired, name, value, defaultValue, onChange, rows },
+    { label, error, placeholder, className, isDisabled, isReadOnly, isRequired, name, value, defaultValue, onChange, onBlur, rows },
     ref
   ) {
     return (
@@ -31,10 +33,16 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           name={name}
           value={value}
           defaultValue={defaultValue}
-          onChange={onChange}
         >
           {label && <Label>{label}</Label>}
-          <HeroTextArea ref={ref} placeholder={placeholder} className={className} rows={rows} />
+          <HeroTextArea
+            ref={ref}
+            placeholder={placeholder}
+            className={className}
+            rows={rows}
+            onChange={onChange}
+            onBlur={onBlur}
+          />
         </TextField>
         {error && <p className="text-xs text-danger">{error}</p>}
       </div>

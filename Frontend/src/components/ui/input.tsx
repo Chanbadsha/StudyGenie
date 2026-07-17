@@ -1,5 +1,7 @@
 import { forwardRef } from 'react';
 import { TextField, Label, Input as HeroInput } from '@heroui/react';
+import type { ChangeEvent } from 'react';
+
 interface InputProps {
   label?: string;
   error?: string;
@@ -8,7 +10,8 @@ interface InputProps {
   type?: string;
   value?: string;
   defaultValue?: string;
-  onChange?: (value: string) => void;
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: (e: ChangeEvent<HTMLInputElement>) => void;
   isDisabled?: boolean;
   isReadOnly?: boolean;
   isRequired?: boolean;
@@ -17,7 +20,7 @@ interface InputProps {
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
   function Input(
-    { label, error, placeholder, className, type, isDisabled, isReadOnly, isRequired, name, onChange, value, defaultValue },
+    { label, error, placeholder, className, type, isDisabled, isReadOnly, isRequired, name, onChange, onBlur, value, defaultValue },
     ref
   ) {
     return (
@@ -30,10 +33,16 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           name={name}
           value={value}
           defaultValue={defaultValue}
-          onChange={onChange}
         >
           {label && <Label>{label}</Label>}
-          <HeroInput ref={ref} placeholder={placeholder} type={type} className={className} />
+          <HeroInput
+            ref={ref}
+            placeholder={placeholder}
+            type={type}
+            className={className}
+            onChange={onChange}
+            onBlur={onBlur}
+          />
         </TextField>
         {error && <p className="text-xs text-danger">{error}</p>}
       </div>
