@@ -24,3 +24,6 @@ export { Modal } from './modal';
 
 export { Heading, Text } from './typography';
 export type { HeadingProps, TextProps } from './typography';
+
+export { Badge } from './badge';
+export type { BadgeProps } from './badge';

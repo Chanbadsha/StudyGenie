@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 interface ContainerProps {
   children: ReactNode;
   className?: string;
-  as?: 'div' | 'section' | 'main';
+  as?: 'div' | 'section' | 'main' | 'article';
 }
 
 function Container({ children, className = '', as: Tag = 'div' }: ContainerProps) {
