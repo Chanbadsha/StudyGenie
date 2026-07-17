@@ -20,7 +20,7 @@ Unlike traditional AI chat applications, StudyGenie is context-aware. It underst
 
 - User Registration & Login
 - Google Authentication
-- Secure JWT Authentication
+- Secure Better Auth Session
 - Responsive Dashboard
 - User Profile Management
 
@@ -92,15 +92,13 @@ Features:
 ## Frontend
 
 - Next.js (App Router)
-- React
 - TypeScript
 - Tailwind CSS
+- HeroUI
 - TanStack Query
 - React Hook Form
 - Zod
-- Framer Motion
-- Chart.js
-- React Icons
+- Recharts
 
 ---
 
@@ -110,7 +108,7 @@ Features:
 - Express.js
 - TypeScript
 - MongoDB
-- JWT Authentication
+- Better Auth
 
 ---
 
@@ -242,7 +240,8 @@ StudyGenie demonstrates practical Agentic AI concepts:
 
 # 🔐 Security
 
-- JWT Authentication
+- Better Auth (Session-based)
+- Google OAuth
 - Protected Routes
 - Role-Based Authorization (Future)
 - Input Validation with Zod
