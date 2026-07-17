@@ -16,6 +16,8 @@ export function getAuth() {
       }),
       baseURL: `${env.betterAuthUrl}${AUTH_BASE_PATH}`,
       basePath: AUTH_BASE_PATH,
+      clientURL: env.clientUrl,
+      trustedOrigins: [env.clientUrl],
       emailAndPassword: {
         enabled: true,
       },

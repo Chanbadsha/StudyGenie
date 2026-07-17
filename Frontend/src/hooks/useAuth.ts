@@ -15,8 +15,8 @@ interface AuthUser {
   updatedAt: string;
 }
 
-function mapSessionToUser(session: BetterAuthSession): AuthUser | null {
-  if (!session.user) return null;
+function mapSessionToUser(session: BetterAuthSession | null): AuthUser | null {
+  if (!session || !session.user) return null;
   return {
     id: session.user.id,
     name: session.user.name,

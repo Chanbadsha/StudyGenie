@@ -30,13 +30,21 @@ export const authService = {
     return response.data;
   },
 
-  googleLogin() {
-    window.location.href = `${AUTH_BASE}/oauth2/authorize?provider=google&callbackURL=${encodeURIComponent(window.location.origin)}`;
+  async googleLogin(): Promise<void> {
+    const callbackURL = `${window.location.origin}/dashboard`;
+    const response = await api.post('/auth/sign-in/social', {
+      provider: 'google',
+      callbackURL,
+      errorCallbackURL: `${window.location.origin}/login`,
+    });
+    if (response.data.url) {
+      window.location.href = response.data.url;
+    }
   },
 
-  async getSession(): Promise<BetterAuthSession> {
-    const response = await api.get('/auth/session');
-    return response.data;
+  async getSession(): Promise<BetterAuthSession | null> {
+    const response = await api.get('/auth/get-session');
+    return response.data ?? null;
   },
 
   async logout() {
