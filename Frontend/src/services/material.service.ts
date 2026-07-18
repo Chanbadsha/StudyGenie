@@ -12,12 +12,12 @@ export interface MaterialQueryParams {
 export const materialService = {
   async getAll(params?: MaterialQueryParams) {
     const response = await api.get('/materials', { params });
-    return response.data;
+    return response.data.data;
   },
 
   async getById(id: string) {
     const response = await api.get(`/materials/${id}`);
-    return response.data;
+    return response.data.data;
   },
 
   async create(data: {
@@ -29,7 +29,7 @@ export const materialService = {
     coverImage?: string;
   }) {
     const response = await api.post('/materials', data);
-    return response.data;
+    return response.data.data;
   },
 
   async delete(id: string) {

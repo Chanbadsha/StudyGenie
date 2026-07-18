@@ -10,7 +10,7 @@ const store = new Map<string, RateLimitEntry>();
 
 const CLEANUP_INTERVAL = 60_000;
 
-setInterval(() => {
+const cleanupTimer = setInterval(() => {
   const now = Date.now();
   for (const [key, entry] of store.entries()) {
     if (entry.resetAt <= now) {
@@ -18,6 +18,8 @@ setInterval(() => {
     }
   }
 }, CLEANUP_INTERVAL);
+
+cleanupTimer.unref();
 
 export function rateLimit(options: { windowMs: number; maxRequests: number }) {
   return (req: Request, res: Response, next: NextFunction): void => {

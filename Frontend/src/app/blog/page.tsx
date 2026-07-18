@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import { Container } from '@/components/layout/container';
 import { Heading, Text } from '@/components/ui/typography';
 import { Card, CardContent } from '@/components/ui/card';
@@ -58,6 +61,12 @@ const BLOG_POSTS = [
 const CATEGORIES = ['All', 'AI & Education', 'Study Tips', 'Tutorials', 'Student Life'];
 
 function BlogPage() {
+  const [selectedCategory, setSelectedCategory] = useState('All');
+
+  const filteredPosts = selectedCategory === 'All'
+    ? BLOG_POSTS
+    : BLOG_POSTS.filter((post) => post.category === selectedCategory);
+
   return (
     <>
       <section className="border-b border-border bg-gradient-to-b from-background to-surface">
@@ -75,7 +84,12 @@ function BlogPage() {
             <button
               key={category}
               type="button"
-              className="rounded-full border border-border px-4 py-1.5 text-sm font-medium text-muted transition-colors hover:border-primary hover:text-primary"
+              onClick={() => setSelectedCategory(category)}
+              className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+                selectedCategory === category
+                  ? 'border-primary bg-primary text-white'
+                  : 'border-border text-muted hover:border-primary hover:text-primary'
+              }`}
             >
               {category}
             </button>
@@ -83,7 +97,7 @@ function BlogPage() {
         </div>
 
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {BLOG_POSTS.map((post) => (
+          {filteredPosts.map((post) => (
             <Card key={post.slug} className="flex flex-col transition-shadow hover:shadow-medium">
               <CardContent className="flex flex-1 flex-col gap-4 p-6">
                 <span className="inline-flex self-start rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">

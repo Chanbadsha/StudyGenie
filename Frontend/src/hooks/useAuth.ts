@@ -75,7 +75,7 @@ export function useLogout() {
   return useMutation({
     mutationFn: () => authService.logout(),
     onSuccess: () => {
-      queryClient.clear();
+      queryClient.removeQueries({ queryKey: ['session'] });
       router.push(ROUTES.home);
     },
   });

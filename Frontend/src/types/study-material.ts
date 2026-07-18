@@ -1,3 +1,9 @@
+export interface StudyMaterialAuthor {
+  id: string;
+  name: string;
+  avatar?: string;
+}
+
 export interface StudyMaterial {
   id: string;
   title: string;
@@ -6,7 +12,7 @@ export interface StudyMaterial {
   shortDescription: string;
   content: string;
   coverImage?: string;
-  createdBy: string;
+  createdBy: string | StudyMaterialAuthor;
   createdAt: string;
   updatedAt: string;
 }

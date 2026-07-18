@@ -19,9 +19,10 @@ export async function getAllMaterials(req: Request, res: Response): Promise<void
   const filter: FilterQuery<IMaterial> = {};
 
   if (search) {
+    const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     filter.$or = [
-      { title: { $regex: search, $options: 'i' } },
-      { shortDescription: { $regex: search, $options: 'i' } },
+      { title: { $regex: escaped, $options: 'i' } },
+      { shortDescription: { $regex: escaped, $options: 'i' } },
     ];
   }
 

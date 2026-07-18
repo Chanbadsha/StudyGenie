@@ -7,6 +7,8 @@ import { ROUTES } from '@/constants/routes';
 import { FeatureCard } from '@/components/cards/feature-card';
 import { StatisticCard } from '@/components/cards/statistic-card';
 import { TestimonialCard } from '@/components/cards/testimonial-card';
+import { PopularMaterialsSection } from '@/components/sections/popular-materials-section';
+import { NewsletterSection } from '@/components/sections/newsletter-section';
 
 const FEATURES = [
   {
@@ -208,6 +210,8 @@ function Home() {
         </div>
       </Container>
 
+      <PopularMaterialsSection />
+
       <section className="border-y border-border bg-surface">
         <Container as="div" className="py-16 lg:py-24">
           <div className="mb-12 text-center">
@@ -255,7 +259,9 @@ function Home() {
         </div>
       </Container>
 
-      <section className="border-t border-border bg-primary/5">
+      <NewsletterSection />
+
+      <section className="border-t border-border bg-background">
         <Container as="div" className="flex flex-col items-center py-16 text-center lg:py-20">
           <Heading level={2}>Ready to Start Learning Smarter?</Heading>
           <Text size="base" className="mt-3 max-w-lg text-muted">

@@ -97,12 +97,10 @@ function MaterialDetailsPage() {
           <Calendar className="size-4" />
           {formatDate(data.createdAt)}
         </span>
-        {data.createdBy && (
+        {data.createdBy && typeof data.createdBy === 'object' && data.createdBy !== null && (
           <span className="flex items-center gap-1.5">
             <User className="size-4" />
-            Created by {'createdBy' in data && typeof data.createdBy === 'object' && data.createdBy !== null
-              ? ((data.createdBy as { name?: string }).name ?? 'Unknown')
-              : 'Unknown'}
+            {(data.createdBy as { name?: string }).name ?? 'Unknown'}
           </span>
         )}
       </div>
@@ -113,10 +111,10 @@ function MaterialDetailsPage() {
         </Text>
       </div>
 
-      <div className="prose prose-sm prose-gray mt-8 max-w-none border-t border-border pt-8">
+      <div className="mt-8 max-w-none border-t border-border pt-8">
         {data.content.split('\n').map((paragraph, index) => (
           paragraph.trim() ? (
-            <p key={index} className="mb-4 leading-relaxed text-foreground">
+            <p key={index} className="mb-4 text-sm leading-relaxed text-foreground">
               {paragraph}
             </p>
           ) : null

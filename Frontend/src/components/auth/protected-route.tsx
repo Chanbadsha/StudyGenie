@@ -14,22 +14,20 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { data: user, isLoading, isError } = useSession();
   const router = useRouter();
 
+  const isUnauthenticated = !isLoading && (!user || isError);
+
   useEffect(() => {
-    if (!isLoading && (!user || isError)) {
+    if (isUnauthenticated) {
       router.push(ROUTES.login);
     }
-  }, [user, isLoading, isError, router]);
+  }, [isUnauthenticated, router]);
 
-  if (isLoading) {
+  if (isLoading || isUnauthenticated) {
     return (
       <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center">
         <Spinner size="lg" label="Loading..." />
       </div>
     );
-  }
-
-  if (!user) {
-    return null;
   }
 
   return <>{children}</>;

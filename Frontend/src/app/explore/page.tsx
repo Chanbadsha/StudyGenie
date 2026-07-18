@@ -15,6 +15,7 @@ import { SUBJECTS } from '@/constants/subjects';
 import { DIFFICULTY_LEVELS } from '@/constants/difficulty';
 import { SORT_OPTIONS, DEFAULT_PAGE_SIZE } from '@/constants/pagination';
 import { BookOpen } from 'lucide-react';
+import type { StudyMaterialAuthor } from '@/types/study-material';
 
 function ExplorePage() {
   const [search, setSearch] = useState('');
@@ -193,18 +194,24 @@ function ExplorePage() {
       ) : (
         <>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {materials.map((material) => (
-              <StudyMaterialCard
-                key={material.id}
-                id={material.id}
-                title={material.title}
-                subject={material.subject}
-                difficulty={material.difficulty}
-                shortDescription={material.shortDescription}
-                coverImage={material.coverImage}
-                createdAt={material.createdAt}
-              />
-            ))}
+            {materials.map((material) => {
+              const authorName = typeof material.createdBy === 'object' && material.createdBy !== null
+                ? (material.createdBy as StudyMaterialAuthor).name
+                : undefined;
+              return (
+                <StudyMaterialCard
+                  key={material.id}
+                  id={material.id}
+                  title={material.title}
+                  subject={material.subject}
+                  difficulty={material.difficulty}
+                  shortDescription={material.shortDescription}
+                  coverImage={material.coverImage}
+                  authorName={authorName}
+                  createdAt={material.createdAt}
+                />
+              );
+            })}
           </div>
 
           {pagination && pagination.totalPages > 1 && (
