@@ -25,6 +25,7 @@ import {
   useDeleteSession,
   useSendMessage,
 } from '@/hooks/useChat';
+import { FadeIn, StaggerContainer, StaggerItem } from '@/components/common/motion-wrapper';
 import { getApiErrorMessage } from '@/utils/api-error';
 import { ROUTES } from '@/constants/routes';
 import type { ChatMessage } from '@/types/chat';
@@ -161,7 +162,6 @@ export default function AIChatPage() {
 
   const sessions = sessionsQuery.data ?? [];
   const messages = sessionDetailQuery.data?.messages ?? [];
-  const isNewSession = activeSessionId !== null && messages.length === 0 && !sessionDetailQuery.isLoading;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -221,23 +221,25 @@ export default function AIChatPage() {
 
   return (
     <Container as="section" className="flex min-h-[calc(100vh-8rem)] flex-col py-4 lg:py-6">
-      <Link
-        href={ROUTES.dashboard}
-        className="mb-3 inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" aria-hidden="true" />
-        Back to Dashboard
-      </Link>
-
-      <div className="flex flex-1 gap-4 overflow-hidden lg:gap-6">
-        <aside className="hidden w-64 shrink-0 flex-col lg:flex">
-          <Card className="flex flex-1 flex-col">
-            <CardHeader className="pb-3">
-              <CardTitle>Chat History</CardTitle>
-              <CardDescription>Your study sessions</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-1 flex-col gap-2 overflow-y-auto">
-              <Button
+      <div className="flex flex-1 gap-4 lg:gap-6">
+        <FadeIn className="hidden w-64 shrink-0 self-start lg:sticky lg:top-24 lg:flex lg:max-h-[calc(100vh-10rem)] lg:flex-col">
+          <div className="flex flex-col rounded-lg border border-border bg-background shadow-low">
+            <div className="border-b border-border p-3">
+              <Link
+                href={ROUTES.dashboard}
+                className="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-foreground"
+              >
+                <ArrowLeft className="size-4" aria-hidden="true" />
+                Back to Dashboard
+              </Link>
+            </div>
+            <Card className="flex flex-1 flex-col rounded-t-none border-0 shadow-none">
+              <CardHeader className="pb-3">
+                <CardTitle>Chat History</CardTitle>
+                <CardDescription>Your study sessions</CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-1 flex-col gap-2 overflow-y-auto">
+                <Button
                 variant="primary"
                 size="sm"
                 fullWidth
@@ -263,24 +265,27 @@ export default function AIChatPage() {
                   <p className="text-sm text-muted">No sessions yet</p>
                 </div>
               ) : (
-                <div className="space-y-1">
+                <StaggerContainer className="space-y-1">
                   {sessions.map((session) => (
-                    <SessionItem
-                      key={session.id}
-                      session={session}
-                      isActive={activeSessionId === session.id}
-                      isDeleting={deleteSession.isPending && deleteSession.variables === session.id}
-                      onSelect={() => handleSelectSession(session.id)}
-                      onDelete={() => handleDeleteSession(session.id)}
-                    />
+                    <StaggerItem key={session.id}>
+                      <SessionItem
+                        session={session}
+                        isActive={activeSessionId === session.id}
+                        isDeleting={deleteSession.isPending && deleteSession.variables === session.id}
+                        onSelect={() => handleSelectSession(session.id)}
+                        onDelete={() => handleDeleteSession(session.id)}
+                      />
+                    </StaggerItem>
                   ))}
-                </div>
+                </StaggerContainer>
               )}
             </CardContent>
           </Card>
-        </aside>
+            </div>
+        </FadeIn>
 
-        <Card className="flex flex-1 flex-col overflow-hidden">
+        <FadeIn className="flex flex-1 flex-col">
+          <Card className="flex flex-1 flex-col overflow-hidden">
           {activeSessionId === null ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-4 px-4 py-12">
               <div className="flex size-16 items-center justify-center rounded-full bg-secondary/10" aria-hidden="true">
@@ -315,8 +320,6 @@ export default function AIChatPage() {
                 onRetry={() => sessionDetailQuery.refetch()}
               />
             </div>
-          ) : isNewSession ? (
-            <NewSessionView onSelectPrompt={handleSuggestedPrompt} />
           ) : (
             <div className="flex flex-1 flex-col overflow-hidden">
               <CardHeader className="border-b border-border pb-3">
@@ -340,11 +343,17 @@ export default function AIChatPage() {
               </CardHeader>
 
               <CardContent className="flex-1 space-y-4 overflow-y-auto py-4">
-                {messages.map((message) => (
-                  <MessageBubble key={message.id} message={message} />
-                ))}
+                {messages.length === 0 && !sendMessage.isPending ? (
+                  <NewSessionView onSelectPrompt={handleSuggestedPrompt} />
+                ) : (
+                  <>
+                    {messages.map((message) => (
+                      <MessageBubble key={message.id} message={message} />
+                    ))}
 
-                {sendMessage.isPending && <TypingIndicator />}
+                    {sendMessage.isPending && <TypingIndicator />}
+                  </>
+                )}
 
                 {sendMessage.error && (
                   <p className="rounded-lg bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">
@@ -355,16 +364,16 @@ export default function AIChatPage() {
                 <div ref={messagesEndRef} />
               </CardContent>
 
-              <CardFooter className="border-t border-border pt-3">
-                <form onSubmit={handleFormSubmit} className="flex w-full gap-3">
-                  <div className="flex-1">
+              <CardFooter className="border-t border-border bg-background px-4 py-3">
+                <form onSubmit={handleFormSubmit} className="flex w-full items-end gap-2">
+                  <div className="relative flex-1">
                     <Textarea
                       placeholder="Ask a question..."
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
                       isDisabled={sendMessage.isPending}
                       rows={1}
-                      className="min-h-[2.5rem] resize-none"
+                      className="min-h-[2.75rem] resize-none rounded-xl border-border bg-surface px-4 py-2.5 pr-12 text-sm shadow-sm transition-shadow focus-within:ring-2 focus-within:ring-primary/30"
                     />
                   </div>
                   <Button
@@ -374,6 +383,7 @@ export default function AIChatPage() {
                     isLoading={sendMessage.isPending}
                     isDisabled={!inputValue.trim() || sendMessage.isPending}
                     aria-label="Send message"
+                    className="mb-[1px] rounded-xl px-4"
                   >
                     {!sendMessage.isPending && <Send className="size-4" aria-hidden="true" />}
                   </Button>
@@ -382,6 +392,7 @@ export default function AIChatPage() {
             </div>
           )}
         </Card>
+        </FadeIn>
       </div>
 
       <div className="mt-3 flex gap-2 lg:hidden">

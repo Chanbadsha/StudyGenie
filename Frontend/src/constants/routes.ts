@@ -9,6 +9,7 @@ export const ROUTES = {
   dashboard: '/dashboard',
   addMaterial: '/materials/add',
   manageMaterials: '/materials/manage',
+  notes: '/notes',
   aiNotes: '/ai/notes',
   aiChat: '/ai/chat',
   analytics: '/analytics',

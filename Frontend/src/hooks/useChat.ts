@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { chatService } from '@/services/chat.service';
-import type { SendMessageInput } from '@/types/chat';
+import type { SendMessageInput, ChatSessionDetail, ChatMessage } from '@/types/chat';
 
 export const CHAT_SESSIONS_KEY = ['chat-sessions'] as const;
 
@@ -41,6 +41,31 @@ export function useSendMessage() {
 
   return useMutation({
     mutationFn: (data: SendMessageInput) => chatService.sendMessage(data),
+    onMutate: async (data) => {
+      await queryClient.cancelQueries({ queryKey: ['chat-session', data.sessionId] });
+      const previous = queryClient.getQueryData<ChatSessionDetail>(['chat-session', data.sessionId]);
+
+      if (previous) {
+        const tempMessage: ChatMessage = {
+          id: `temp-${Date.now()}`,
+          sessionId: data.sessionId,
+          role: 'user',
+          content: data.message,
+          createdAt: new Date().toISOString(),
+        };
+        queryClient.setQueryData<ChatSessionDetail>(['chat-session', data.sessionId], {
+          ...previous,
+          messages: [...previous.messages, tempMessage],
+        });
+      }
+
+      return { previous };
+    },
+    onError: (_error, variables, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['chat-session', variables.sessionId], context.previous);
+      }
+    },
     onSuccess: async (_data, variables) => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['chat-session', variables.sessionId] }),

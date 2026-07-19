@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { BookOpen, Menu, X, LogOut, LayoutDashboard } from 'lucide-react';
+import { BookOpen, Menu, X, LogOut, LayoutDashboard, Bot } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { useSession, useLogout } from '@/hooks/useAuth';
@@ -11,6 +11,8 @@ const NAV_LINKS = [
   { href: ROUTES.home, label: 'Home' },
   { href: ROUTES.explore, label: 'Explore' },
   { href: ROUTES.about, label: 'About' },
+  { href: ROUTES.blog, label: 'Blog' },
+  { href: ROUTES.contact, label: 'Contact' },
 ] as const;
 
 function Navbar() {
@@ -39,6 +41,15 @@ function Navbar() {
               {link.label}
             </Link>
           ))}
+          {user && (
+            <Link
+              href={ROUTES.aiChat}
+              className="flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+            >
+              <Bot className="size-4" />
+              AI Tutor
+            </Link>
+          )}
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
@@ -102,6 +113,12 @@ function Navbar() {
             <div className="flex flex-col gap-2 pt-2">
               {user ? (
                 <>
+                  <Link href={ROUTES.aiChat} onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="ghost" size="sm" className="w-full">
+                      <Bot className="mr-1.5 size-4" />
+                      AI Tutor
+                    </Button>
+                  </Link>
                   <Link href={ROUTES.dashboard} onClick={() => setIsMenuOpen(false)}>
                     <Button variant="ghost" size="sm" className="w-full">
                       Dashboard

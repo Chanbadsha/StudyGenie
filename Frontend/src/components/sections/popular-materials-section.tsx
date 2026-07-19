@@ -12,6 +12,7 @@ import { EmptyState } from '@/components/common/empty-state';
 import { materialService } from '@/services/material.service';
 import { ROUTES } from '@/constants/routes';
 import type { StudyMaterial, StudyMaterialAuthor } from '@/types/study-material';
+import { FadeIn, StaggerContainer, StaggerItem } from '@/components/common/motion-wrapper';
 
 function PopularMaterialsSection() {
   const { data, isLoading, isError } = useQuery({
@@ -23,12 +24,12 @@ function PopularMaterialsSection() {
 
   return (
     <Container as="section" className="py-16 lg:py-24">
-      <div className="mb-12 text-center">
+      <FadeIn className="mb-12 text-center">
         <Heading level={2}>Popular Study Materials</Heading>
         <Text size="base" className="mt-3 text-muted">
           Explore trending materials created by the community.
         </Text>
-      </div>
+      </FadeIn>
 
       {isLoading ? (
         <SkeletonCard count={6} />
@@ -40,34 +41,35 @@ function PopularMaterialsSection() {
         />
       ) : (
         <>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <StaggerContainer className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {materials.map((material) => {
               const authorName = typeof material.createdBy === 'object' && material.createdBy !== null
                 ? (material.createdBy as StudyMaterialAuthor).name
                 : undefined;
               return (
-                <StudyMaterialCard
-                  key={material.id}
-                  id={material.id}
-                  title={material.title}
-                  subject={material.subject}
-                  difficulty={material.difficulty}
-                  shortDescription={material.shortDescription}
-                  coverImage={material.coverImage}
-                  authorName={authorName}
-                  createdAt={material.createdAt}
-                />
+                <StaggerItem key={material.id}>
+                  <StudyMaterialCard
+                    id={material.id}
+                    title={material.title}
+                    subject={material.subject}
+                    difficulty={material.difficulty}
+                    shortDescription={material.shortDescription}
+                    coverImage={material.coverImage}
+                    authorName={authorName}
+                    createdAt={material.createdAt}
+                  />
+                </StaggerItem>
               );
             })}
-          </div>
+          </StaggerContainer>
 
-          <div className="mt-10 text-center">
+          <FadeIn className="mt-10 text-center">
             <Link href={ROUTES.explore}>
               <Button variant="outline" size="lg">
                 View All Materials
               </Button>
             </Link>
-          </div>
+          </FadeIn>
         </>
       )}
     </Container>

@@ -15,6 +15,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { SUBJECTS } from '@/constants/subjects';
 import { DIFFICULTY_LEVELS } from '@/constants/difficulty';
 import { SORT_OPTIONS, DEFAULT_PAGE_SIZE } from '@/constants/pagination';
+import { FadeIn, StaggerContainer, StaggerItem } from '@/components/common/motion-wrapper';
 import type { StudyMaterialAuthor } from '@/types/study-material';
 
 function ExplorePage() {
@@ -100,14 +101,14 @@ function ExplorePage() {
 
   return (
     <Container as="section" className="py-8 lg:py-12">
-      <div className="mb-8">
+      <FadeIn className="mb-8">
         <Heading level={1}>Explore Study Materials</Heading>
         <Text size="base" className="mt-1 text-muted">
           Discover study materials created by the community.
         </Text>
-      </div>
+      </FadeIn>
 
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center">
+      <FadeIn y={16} className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted" />
           <input
@@ -132,115 +133,124 @@ function ExplorePage() {
             </span>
           )}
         </Button>
-      </div>
+      </FadeIn>
 
       {showFilters && (
-        <div className="mb-6 rounded-lg border border-border bg-surface p-4">
-          <div className="flex flex-wrap items-end gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-foreground">Subject</label>
-              <select
-                value={subject}
-                onChange={(e) => handleSubjectChange(e.target.value)}
-                className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                aria-label="Filter by subject"
-              >
-                <option value="">All Subjects</option>
-                {SUBJECTS.map((s) => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-            </div>
+        <FadeIn y={16} className="mb-6">
+          <div className="rounded-lg border border-border bg-surface p-4">
+            <div className="flex flex-wrap items-end gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-foreground">Subject</label>
+                <select
+                  value={subject}
+                  onChange={(e) => handleSubjectChange(e.target.value)}
+                  className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  aria-label="Filter by subject"
+                >
+                  <option value="">All Subjects</option>
+                  {SUBJECTS.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-foreground">Difficulty</label>
-              <select
-                value={difficulty}
-                onChange={(e) => handleDifficultyChange(e.target.value)}
-                className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                aria-label="Filter by difficulty"
-              >
-                <option value="">All Levels</option>
-                {DIFFICULTY_LEVELS.map((d) => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
-            </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-foreground">Difficulty</label>
+                <select
+                  value={difficulty}
+                  onChange={(e) => handleDifficultyChange(e.target.value)}
+                  className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  aria-label="Filter by difficulty"
+                >
+                  <option value="">All Levels</option>
+                  {DIFFICULTY_LEVELS.map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+              </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-foreground">Sort By</label>
-              <select
-                value={sort}
-                onChange={(e) => handleSortChange(e.target.value)}
-                className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                aria-label="Sort by"
-              >
-                {SORT_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
-                ))}
-              </select>
-            </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-foreground">Sort By</label>
+                <select
+                  value={sort}
+                  onChange={(e) => handleSortChange(e.target.value)}
+                  className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  aria-label="Sort by"
+                >
+                  {SORT_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+              </div>
 
-            {hasActiveFilters && (
-              <Button variant="ghost" size="sm" onClick={clearFilters}>
-                <X className="mr-1 size-4" />
-                Clear Filters
-              </Button>
-            )}
+              {hasActiveFilters && (
+                <Button variant="ghost" size="sm" onClick={clearFilters}>
+                  <X className="mr-1 size-4" />
+                  Clear Filters
+                </Button>
+              )}
+            </div>
           </div>
-        </div>
+        </FadeIn>
       )}
 
       {isLoading ? (
-        <SkeletonCard count={6} />
+        <FadeIn>
+          <SkeletonCard count={6} />
+        </FadeIn>
       ) : isError ? (
-        <ErrorState
-          title="Failed to load materials"
-          message="Could not load study materials. Please try again."
-          onRetry={() => refetch()}
-        />
+        <FadeIn>
+          <ErrorState
+            title="Failed to load materials"
+            message="Could not load study materials. Please try again."
+            onRetry={() => refetch()}
+          />
+        </FadeIn>
       ) : materials.length === 0 ? (
-        <EmptyState
-          icon={<BookOpen className="size-12" />}
-          title="No materials found"
-          description={
-            hasActiveFilters
-              ? 'Try adjusting your search or filters.'
-              : 'No study materials have been created yet.'
-          }
-          action={
-            hasActiveFilters ? (
-              <Button variant="primary" onClick={clearFilters}>
-                Clear Filters
-              </Button>
-            ) : undefined
-          }
-        />
+        <FadeIn>
+          <EmptyState
+            icon={<BookOpen className="size-12" />}
+            title="No materials found"
+            description={
+              hasActiveFilters
+                ? 'Try adjusting your search or filters.'
+                : 'No study materials have been created yet.'
+            }
+            action={
+              hasActiveFilters ? (
+                <Button variant="primary" onClick={clearFilters}>
+                  Clear Filters
+                </Button>
+              ) : undefined
+            }
+          />
+        </FadeIn>
       ) : (
         <>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <StaggerContainer className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {materials.map((material) => {
               const authorName = typeof material.createdBy === 'object' && material.createdBy !== null
                 ? (material.createdBy as StudyMaterialAuthor).name
                 : undefined;
               return (
-                <StudyMaterialCard
-                  key={material.id}
-                  id={material.id}
-                  title={material.title}
-                  subject={material.subject}
-                  difficulty={material.difficulty}
-                  shortDescription={material.shortDescription}
-                  coverImage={material.coverImage}
-                  authorName={authorName}
-                  createdAt={material.createdAt}
-                />
+                <StaggerItem key={material.id}>
+                  <StudyMaterialCard
+                    id={material.id}
+                    title={material.title}
+                    subject={material.subject}
+                    difficulty={material.difficulty}
+                    shortDescription={material.shortDescription}
+                    coverImage={material.coverImage}
+                    authorName={authorName}
+                    createdAt={material.createdAt}
+                  />
+                </StaggerItem>
               );
             })}
-          </div>
+          </StaggerContainer>
 
           {pagination && pagination.totalPages > 1 && (
-            <div className="mt-8 flex items-center justify-center gap-2">
+            <FadeIn className="mt-8 flex items-center justify-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -279,7 +289,7 @@ function ExplorePage() {
               >
                 Next
               </Button>
-            </div>
+            </FadeIn>
           )}
         </>
       )}

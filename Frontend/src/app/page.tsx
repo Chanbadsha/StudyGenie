@@ -9,6 +9,7 @@ import { StatisticCard } from '@/components/cards/statistic-card';
 import { TestimonialCard } from '@/components/cards/testimonial-card';
 import { PopularMaterialsSection } from '@/components/sections/popular-materials-section';
 import { NewsletterSection } from '@/components/sections/newsletter-section';
+import { FadeIn, StaggerContainer, StaggerItem } from '@/components/common/motion-wrapper';
 
 const FEATURES = [
   {
@@ -117,7 +118,7 @@ function Home() {
     <>
       <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-background to-surface">
         <Container as="div" className="flex flex-col items-center py-20 lg:py-28">
-          <div className="flex max-w-3xl flex-col items-center text-center">
+          <FadeIn y={30} className="flex max-w-3xl flex-col items-center text-center">
             <Heading level={1}>
               Learn Smarter with{' '}
               <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
@@ -141,42 +142,43 @@ function Home() {
               </Link>
             </div>
             <p className="mt-4 text-xs text-muted">No credit card required. Free forever.</p>
-          </div>
+          </FadeIn>
         </Container>
       </section>
 
       <Container as="section" className="py-16 lg:py-24">
-        <div className="mb-12 text-center">
+        <FadeIn className="mb-12 text-center">
           <Heading level={2}>Everything You Need to Study Better</Heading>
           <Text size="base" className="mt-3 text-muted">
             Powerful features designed to make your study sessions more effective.
           </Text>
-        </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        </FadeIn>
+        <StaggerContainer className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((feature) => (
-            <FeatureCard
-              key={feature.title}
-              icon={feature.icon}
-              title={feature.title}
-              description={feature.description}
-            />
+            <StaggerItem key={feature.title}>
+              <FeatureCard
+                icon={feature.icon}
+                title={feature.title}
+                description={feature.description}
+              />
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </Container>
 
       <section className="border-y border-border bg-surface">
         <Container as="div" className="py-16 lg:py-24">
-          <div className="mb-12 text-center">
+          <FadeIn className="mb-12 text-center">
             <Heading level={2}>Powered by Advanced AI</Heading>
             <Text size="base" className="mt-3 text-muted">
               Leverage the latest AI technology to accelerate your learning.
             </Text>
-          </div>
-          <div className="grid gap-8 lg:grid-cols-3">
+          </FadeIn>
+          <StaggerContainer className="grid gap-8 lg:grid-cols-3">
             {AI_CAPABILITIES.map((capability) => {
               const Icon = capability.icon;
               return (
-                <div key={capability.title} className="flex flex-col items-center text-center">
+                <StaggerItem key={capability.title} className="flex flex-col items-center text-center">
                   <div className="mb-4 inline-flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                     <Icon className="size-7" />
                   </div>
@@ -184,101 +186,104 @@ function Home() {
                   <Text size="sm" className="mt-2 text-muted">
                     {capability.description}
                   </Text>
-                </div>
+                </StaggerItem>
               );
             })}
-          </div>
+          </StaggerContainer>
         </Container>
       </section>
 
       <Container as="section" className="py-16 lg:py-24">
-        <div className="mb-12 text-center">
+        <FadeIn className="mb-12 text-center">
           <Heading level={2}>Trusted by Students Worldwide</Heading>
           <Text size="base" className="mt-3 text-muted">
             Join thousands of students who have transformed their study habits.
           </Text>
-        </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        </FadeIn>
+        <StaggerContainer className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {STATISTICS.map((stat) => (
-            <StatisticCard
-              key={stat.label}
-              icon={stat.icon}
-              value={stat.value}
-              label={stat.label}
-            />
+            <StaggerItem key={stat.label}>
+              <StatisticCard
+                icon={stat.icon}
+                value={stat.value}
+                label={stat.label}
+              />
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </Container>
 
       <PopularMaterialsSection />
 
       <section className="border-y border-border bg-surface">
         <Container as="div" className="py-16 lg:py-24">
-          <div className="mb-12 text-center">
+          <FadeIn className="mb-12 text-center">
             <Heading level={2}>What Our Users Say</Heading>
             <Text size="base" className="mt-3 text-muted">
               Hear from students who use StudyGenie every day.
             </Text>
-          </div>
-          <div className="grid gap-6 md:grid-cols-3">
+          </FadeIn>
+          <StaggerContainer className="grid gap-6 md:grid-cols-3">
             {TESTIMONIALS.map((testimonial) => (
-              <TestimonialCard
-                key={testimonial.author}
-                quote={testimonial.quote}
-                author={testimonial.author}
-                role={testimonial.role}
-                avatar={testimonial.avatar}
-              />
+              <StaggerItem key={testimonial.author}>
+                <TestimonialCard
+                  quote={testimonial.quote}
+                  author={testimonial.author}
+                  role={testimonial.role}
+                  avatar={testimonial.avatar}
+                />
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </Container>
       </section>
 
       <Container as="section" className="py-16 lg:py-24">
-        <div className="mb-12 text-center">
+        <FadeIn className="mb-12 text-center">
           <Heading level={2}>Frequently Asked Questions</Heading>
           <Text size="base" className="mt-3 text-muted">
             Everything you need to know about StudyGenie.
           </Text>
-        </div>
-        <div className="mx-auto max-w-3xl space-y-4">
+        </FadeIn>
+        <StaggerContainer className="mx-auto max-w-3xl space-y-4">
           {FAQ_ITEMS.map((item) => (
-            <details
-              key={item.question}
-              className="group rounded-lg border border-border bg-background transition-shadow hover:shadow-low"
-            >
-              <summary className="flex cursor-pointer items-center justify-between px-6 py-4 text-sm font-medium text-foreground">
-                {item.question}
-                <ChevronDown className="size-4 text-muted transition-transform group-open:rotate-180" />
-              </summary>
-              <div className="border-t border-border px-6 py-4">
-                <p className="text-sm leading-relaxed text-muted">{item.answer}</p>
-              </div>
-            </details>
+            <StaggerItem key={item.question}>
+              <details className="group rounded-lg border border-border bg-background transition-shadow hover:shadow-low">
+                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 text-sm font-medium text-foreground">
+                  {item.question}
+                  <ChevronDown className="size-4 text-muted transition-transform group-open:rotate-180" />
+                </summary>
+                <div className="border-t border-border px-6 py-4">
+                  <p className="text-sm leading-relaxed text-muted">{item.answer}</p>
+                </div>
+              </details>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </Container>
 
       <NewsletterSection />
 
       <section className="border-t border-border bg-background">
         <Container as="div" className="flex flex-col items-center py-16 text-center lg:py-20">
-          <Heading level={2}>Ready to Start Learning Smarter?</Heading>
-          <Text size="base" className="mt-3 max-w-lg text-muted">
-            Join thousands of students who have already transformed their study experience with AI.
-          </Text>
-          <div className="mt-8 flex items-center gap-4">
-            <Link href={ROUTES.register}>
-              <Button variant="primary" size="lg">
-                Get Started Free
-              </Button>
-            </Link>
-            <Link href={ROUTES.explore}>
-              <Button variant="outline" size="lg">
-                Explore Materials
-              </Button>
-            </Link>
-          </div>
+          <FadeIn className="flex flex-col items-center">
+            <Heading level={2}>Ready to Start Learning Smarter?</Heading>
+            <Text size="base" className="mt-3 max-w-lg text-muted">
+              Join thousands of students who have already transformed their study experience with AI.
+            </Text>
+            <div className="mt-8 flex items-center gap-4">
+              <Link href={ROUTES.register}>
+                <Button variant="primary" size="lg">
+                  Get Started Free
+                </Button>
+              </Link>
+              <Link href={ROUTES.explore}>
+                <Button variant="outline" size="lg">
+                  Explore Materials
+                </Button>
+              </Link>
+            </div>
+          </FadeIn>
         </Container>
       </section>
     </>
