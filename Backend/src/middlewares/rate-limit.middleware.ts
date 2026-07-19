@@ -6,6 +6,12 @@ interface RateLimitEntry {
   resetAt: number;
 }
 
+interface RateLimitOptions {
+  windowMs: number;
+  maxRequests: number;
+  keyGenerator?: (req: Request) => string;
+}
+
 const store = new Map<string, RateLimitEntry>();
 
 const CLEANUP_INTERVAL = 60_000;
@@ -21,9 +27,9 @@ const cleanupTimer = setInterval(() => {
 
 cleanupTimer.unref();
 
-export function rateLimit(options: { windowMs: number; maxRequests: number }) {
+export function rateLimit(options: RateLimitOptions) {
   return (req: Request, res: Response, next: NextFunction): void => {
-    const key = req.ip || req.socket.remoteAddress || 'unknown';
+    const key = options.keyGenerator?.(req) || req.ip || req.socket.remoteAddress || 'unknown';
     const now = Date.now();
 
     const entry = store.get(key);

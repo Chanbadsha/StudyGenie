@@ -1,6 +1,7 @@
 import { forwardRef } from 'react';
 import { Button as HeroButton } from '@heroui/react';
 import type { ComponentPropsWithRef } from 'react';
+import { LoaderCircle } from 'lucide-react';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -39,7 +40,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         isDisabled={isLoading || props.isDisabled}
         {...props}
       >
-        {children}
+        {typeof children === 'function' ? children : (
+          <>
+            {isLoading && <LoaderCircle className="mr-2 size-4 animate-spin" aria-hidden="true" />}
+            {children}
+          </>
+        )}
       </HeroButton>
     );
   }

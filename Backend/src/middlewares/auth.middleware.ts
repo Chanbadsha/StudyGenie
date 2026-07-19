@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { fromNodeHeaders } from 'better-auth/node';
 import { sendError } from '../utils/api-response';
 import { getAuth } from '../config/auth';
 
@@ -13,23 +14,17 @@ export function requireAuth(req: AuthenticatedRequest, res: Response, next: Next
     return;
   }
 
-  const webRequest = new Request(`${req.protocol}://${req.get('host')}${req.originalUrl}`, {
-    method: req.method,
-    headers: req.headers as Record<string, string>,
-  });
-
-  auth.handler(webRequest)
-    .then(async (response) => {
-      const sessionData = await response.json().catch(() => null);
-
-      const body = sessionData as { user?: { id: string } } | null;
-
-      if (!body?.user) {
+  void auth.api.getSession({
+    headers: fromNodeHeaders(req.headers),
+    query: { disableCookieCache: true },
+  })
+    .then((session) => {
+      if (!session?.user?.id) {
         sendError(res, 'Authentication required.', 401);
         return;
       }
 
-      req.userId = body.user.id;
+      req.userId = session.user.id;
       next();
     })
     .catch(() => {

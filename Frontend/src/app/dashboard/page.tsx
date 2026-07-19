@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen, Sparkles, Brain, Plus, ArrowRight, Clock } from 'lucide-react';
+import { BookOpen, Sparkles, Brain, FolderOpen, Plus, ArrowRight, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { Container } from '@/components/layout/container';
 import { Heading, Text } from '@/components/ui/typography';
@@ -10,41 +10,47 @@ import { SkeletonCard, Spinner } from '@/components/common/loading';
 import { EmptyState } from '@/components/common/empty-state';
 import { ErrorState } from '@/components/common/error-state';
 import { ROUTES } from '@/constants/routes';
+import { useAIHistory } from '@/hooks/useAI';
 import { useSession } from '@/hooks/useAuth';
+import { useMyMaterials } from '@/hooks/useStudyMaterials';
+import { formatDate } from '@/utils/format-date';
 
 const QUICK_ACTIONS = [
   {
     icon: Plus,
     title: 'New Study Material',
-    description: 'Create study material with AI assistance.',
+    description: 'Create a new study material for your library.',
     href: ROUTES.addMaterial,
     variant: 'primary' as const,
   },
   {
+    icon: FolderOpen,
+    title: 'Manage Materials',
+    description: 'Review or remove your study materials.',
+    href: ROUTES.manageMaterials,
+    variant: 'secondary' as const,
+  },
+  {
     icon: Sparkles,
-    title: 'Generate Notes',
-    description: 'Generate AI-powered notes instantly.',
+    title: 'Generate AI Notes',
+    description: 'Turn a learning goal into structured study notes.',
     href: ROUTES.aiNotes,
     variant: 'secondary' as const,
   },
   {
-    icon: Brain,
-    title: 'AI Tutor',
-    description: 'Chat with your AI study assistant.',
-    href: ROUTES.aiChat,
+    icon: BookOpen,
+    title: 'Explore Materials',
+    description: 'Browse study materials from the community.',
+    href: ROUTES.explore,
     variant: 'outline' as const,
   },
 ];
 
-const RECENT_MATERIALS: {
-  id: string;
-  title: string;
-  subject: string;
-  updatedAt: string;
-}[] = [];
-
 export default function DashboardPage() {
   const { data: user, isLoading, isError, refetch } = useSession();
+  const materialsQuery = useMyMaterials({ limit: 5, sort: 'newest' }, !!user);
+  const aiHistoryQuery = useAIHistory(!!user);
+  const recentMaterials = materialsQuery.data?.materials ?? [];
 
   if (isLoading) {
     return (
@@ -80,7 +86,7 @@ export default function DashboardPage() {
         </Text>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader>
             <BookOpen className="size-8 text-primary" />
@@ -88,7 +94,7 @@ export default function DashboardPage() {
             <CardDescription>Total materials created</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-foreground">0</p>
+            <p className="text-3xl font-bold text-foreground">{materialsQuery.data?.pagination.total ?? 0}</p>
           </CardContent>
         </Card>
 
@@ -99,7 +105,7 @@ export default function DashboardPage() {
             <CardDescription>Notes generated</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-foreground">0</p>
+            <p className="text-3xl font-bold text-foreground">{aiHistoryQuery.data?.length ?? 0}</p>
           </CardContent>
         </Card>
 
@@ -119,7 +125,7 @@ export default function DashboardPage() {
         <Heading level={2} className="mb-4">
           Quick Actions
         </Heading>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {QUICK_ACTIONS.map((action) => (
             <Link key={action.title} href={action.href}>
               <Card className="h-full transition-shadow hover:shadow-medium">
@@ -147,18 +153,26 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        {RECENT_MATERIALS.length > 0 ? (
+        {materialsQuery.isLoading ? (
+          <SkeletonCard count={3} />
+        ) : materialsQuery.isError ? (
+          <ErrorState
+            title="Failed to load recent materials"
+            message="Could not load your recent materials. Please try again."
+            onRetry={() => materialsQuery.refetch()}
+          />
+        ) : recentMaterials.length > 0 ? (
           <div className="space-y-3">
-            {RECENT_MATERIALS.map((material) => (
+            {recentMaterials.map((material) => (
               <Card key={material.id}>
-                <CardContent className="flex items-center justify-between">
-                  <div>
+                <CardContent className="flex min-w-0 items-center justify-between gap-4">
+                  <div className="min-w-0">
                     <CardTitle>{material.title}</CardTitle>
                     <CardDescription>{material.subject}</CardDescription>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-muted">
+                  <div className="flex shrink-0 items-center gap-2 text-sm text-muted">
                     <Clock className="size-4" />
-                    {material.updatedAt}
+                    {formatDate(material.updatedAt)}
                   </div>
                 </CardContent>
               </Card>

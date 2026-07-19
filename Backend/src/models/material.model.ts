@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import './user.model';
 
 export interface IMaterial extends Document {
   title: string;
@@ -25,6 +26,7 @@ const materialSchema = new Schema<IMaterial>(
       type: String,
       required: true,
       trim: true,
+      maxlength: 100,
     },
     difficulty: {
       type: String,
@@ -61,6 +63,7 @@ const materialSchema = new Schema<IMaterial>(
 materialSchema.index({ title: 'text', shortDescription: 'text' });
 materialSchema.index({ subject: 1 });
 materialSchema.index({ difficulty: 1 });
+materialSchema.index({ createdBy: 1 });
 materialSchema.index({ createdAt: -1 });
 
 export const Material = mongoose.model<IMaterial>('Material', materialSchema);

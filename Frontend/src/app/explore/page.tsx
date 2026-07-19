@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { Search, SlidersHorizontal, X, BookOpen } from 'lucide-react';
 import { Container } from '@/components/layout/container';
 import { Heading, Text } from '@/components/ui/typography';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,6 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { SUBJECTS } from '@/constants/subjects';
 import { DIFFICULTY_LEVELS } from '@/constants/difficulty';
 import { SORT_OPTIONS, DEFAULT_PAGE_SIZE } from '@/constants/pagination';
-import { BookOpen } from 'lucide-react';
 import type { StudyMaterialAuthor } from '@/types/study-material';
 
 function ExplorePage() {

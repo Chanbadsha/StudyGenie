@@ -16,10 +16,7 @@ import type { StudyMaterial, StudyMaterialAuthor } from '@/types/study-material'
 function PopularMaterialsSection() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['materials', 'popular'],
-    queryFn: async () => {
-      const response = await materialService.getAll({ limit: 6, sort: 'newest' });
-      return response.data;
-    },
+    queryFn: () => materialService.getAll({ limit: 6, sort: 'newest' }),
   });
 
   const materials: StudyMaterial[] = data?.materials ?? [];

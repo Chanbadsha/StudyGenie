@@ -10,7 +10,7 @@ export interface StudyMaterial {
   subject: string;
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
   shortDescription: string;
-  content: string;
+  content?: string;
   coverImage?: string;
   createdBy: string | StudyMaterialAuthor;
   createdAt: string;
@@ -20,7 +20,7 @@ export interface StudyMaterial {
 export interface CreateMaterialInput {
   title: string;
   subject: string;
-  difficulty: string;
+  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
   shortDescription: string;
   content: string;
   coverImage?: string;

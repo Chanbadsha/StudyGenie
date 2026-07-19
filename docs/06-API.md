@@ -220,6 +220,16 @@ Example
 /materials?page=1&limit=12&subject=Math&difficulty=Beginner&sort=newest
 ```
 
+## Get My Materials
+
+### GET
+
+```http
+/materials/mine
+```
+
+Authentication required. Returns only materials owned by the authenticated user and supports the same pagination, search, filter, and sort parameters as the public material list.
+
 ---
 
 ## Get Material Details
@@ -279,10 +289,22 @@ Authentication required.
   "success": true,
   "message": "Notes generated successfully.",
   "data": {
-    "response": "Generated AI notes..."
+    "id": "GENERATION_ID",
+    "userId": "USER_ID",
+    "type": "Notes",
+    "topic": "Newton's Laws",
+    "subject": "Physics",
+    "difficulty": "Intermediate",
+    "learningGoal": "Understand motion",
+    "response": "Generated AI notes...",
+    "outputLength": "Medium",
+    "aiModel": "gemini-2.5-flash",
+    "createdAt": "2026-07-19T12:00:00.000Z"
   }
 }
 ```
+
+Submitting the same structured input again generates a fresh response and saves a new history entry. This is the regeneration flow.
 
 ---
 
@@ -294,7 +316,19 @@ Authentication required.
 /ai/history
 ```
 
-Returns all AI generations for the authenticated user.
+Authentication required. Returns the authenticated user's notes in newest-first order.
+
+```json
+{
+  "success": true,
+  "message": "AI notes history fetched successfully.",
+  "data": {
+    "generations": []
+  }
+}
+```
+
+Internal prompt templates are not returned in history responses.
 
 ---
 
@@ -306,7 +340,7 @@ Returns all AI generations for the authenticated user.
 /ai/history/:id
 ```
 
-Deletes one AI generation owned by the authenticated user.
+Authentication required. Deletes one AI generation owned by the authenticated user. A generation belonging to another user returns `403 Forbidden`.
 
 ---
 

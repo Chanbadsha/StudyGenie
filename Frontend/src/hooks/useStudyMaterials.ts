@@ -1,26 +1,48 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { materialService } from '@/services/material.service';
 import type { MaterialQueryParams } from '@/services/material.service';
-import type { StudyMaterial } from '@/types/study-material';
+import type { CreateMaterialInput } from '@/types/study-material';
 
-interface PaginationInfo {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-}
-
-interface MaterialsResponse {
-  materials: StudyMaterial[];
-  pagination: PaginationInfo;
-}
-
-export function useStudyMaterials(params: MaterialQueryParams) {
-  return useQuery<MaterialsResponse>({
+export function useStudyMaterials(params: MaterialQueryParams, enabled = true) {
+  return useQuery({
     queryKey: ['materials', params],
-    queryFn: async () => {
-      const response = await materialService.getAll(params);
-      return response.data;
+    queryFn: () => materialService.getAll(params),
+    enabled,
+  });
+}
+
+export function useMyMaterials(params: MaterialQueryParams, enabled = true) {
+  return useQuery({
+    queryKey: ['my-materials', params],
+    queryFn: () => materialService.getMine(params),
+    enabled,
+  });
+}
+
+export function useCreateMaterial() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateMaterialInput) => materialService.create(data),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['materials'] }),
+        queryClient.invalidateQueries({ queryKey: ['my-materials'] }),
+      ]);
+    },
+  });
+}
+
+export function useDeleteMaterial() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => materialService.delete(id),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['materials'] }),
+        queryClient.invalidateQueries({ queryKey: ['my-materials'] }),
+      ]);
     },
   });
 }

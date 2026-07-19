@@ -20,15 +20,12 @@ const difficultyColorMap: Record<string, string> = {
 };
 
 function MaterialDetailsPage() {
-  const params = useParams();
-  const id = params.id as string;
+  const params = useParams<{ id: string }>();
+  const id = params.id;
 
   const { data, isLoading, isError, refetch } = useQuery<StudyMaterial>({
     queryKey: ['material', id],
-    queryFn: async () => {
-      const response = await materialService.getById(id);
-      return response.data;
-    },
+    queryFn: () => materialService.getById(id),
     enabled: !!id,
   });
 
@@ -112,7 +109,7 @@ function MaterialDetailsPage() {
       </div>
 
       <div className="mt-8 max-w-none border-t border-border pt-8">
-        {data.content.split('\n').map((paragraph, index) => (
+        {(data.content ?? '').split('\n').map((paragraph, index) => (
           paragraph.trim() ? (
             <p key={index} className="mb-4 text-sm leading-relaxed text-foreground">
               {paragraph}
