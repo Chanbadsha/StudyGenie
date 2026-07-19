@@ -346,6 +346,14 @@ Authentication required. Deletes one AI generation owned by the authenticated us
 
 # 8. AI Tutor APIs
 
+All chat endpoints require authentication.
+
+Rate limits:
+- Chat sessions (list/create/delete): 30 requests/minute/user
+- Chat messages (send): 60 requests/hour/user
+
+---
+
 ## Create Chat Session
 
 ### POST
@@ -354,7 +362,33 @@ Authentication required. Deletes one AI generation owned by the authenticated us
 /chat/sessions
 ```
 
-Creates a new AI chat session.
+Authentication required.
+
+### Request Body (optional)
+
+```json
+{
+  "title": "Physics Study Session"
+}
+```
+
+If omitted, the session is created with the default title `"New Chat"` and is automatically renamed after the first message.
+
+### Response (201 Created)
+
+```json
+{
+  "success": true,
+  "message": "Chat session created.",
+  "data": {
+    "id": "SESSION_ID",
+    "title": "New Chat",
+    "lastMessageAt": null,
+    "createdAt": "2026-07-19T12:00:00.000Z",
+    "updatedAt": "2026-07-19T12:00:00.000Z"
+  }
+}
+```
 
 ---
 
@@ -366,7 +400,27 @@ Creates a new AI chat session.
 /chat/sessions
 ```
 
-Returns the authenticated user's chat sessions.
+Authentication required. Returns the authenticated user's chat sessions in newest-first order (up to 50).
+
+### Response
+
+```json
+{
+  "success": true,
+  "message": "Chat sessions fetched successfully.",
+  "data": {
+    "sessions": [
+      {
+        "id": "SESSION_ID",
+        "title": "Physics Study Session",
+        "lastMessageAt": "2026-07-19T12:05:00.000Z",
+        "createdAt": "2026-07-19T12:00:00.000Z",
+        "updatedAt": "2026-07-19T12:05:00.000Z"
+      }
+    ]
+  }
+}
+```
 
 ---
 
@@ -378,7 +432,45 @@ Returns the authenticated user's chat sessions.
 /chat/sessions/:id
 ```
 
-Returns a specific chat session with all messages.
+Authentication required. Returns the session with all messages, ordered oldest-first.
+
+Authentication required. Accessing another user's session returns `403 Forbidden`.
+
+### Response
+
+```json
+{
+  "success": true,
+  "message": "Chat session fetched successfully.",
+  "data": {
+    "session": {
+      "id": "SESSION_ID",
+      "title": "Physics Study Session",
+      "lastMessageAt": "2026-07-19T12:05:00.000Z",
+      "createdAt": "2026-07-19T12:00:00.000Z",
+      "updatedAt": "2026-07-19T12:05:00.000Z"
+    },
+    "messages": [
+      {
+        "id": "MSG_ID",
+        "sessionId": "SESSION_ID",
+        "role": "user",
+        "content": "Explain Newton's First Law.",
+        "createdAt": "2026-07-19T12:00:00.000Z"
+      },
+      {
+        "id": "MSG_ID",
+        "sessionId": "SESSION_ID",
+        "role": "assistant",
+        "content": "Newton's First Law states that an object at rest...",
+        "createdAt": "2026-07-19T12:00:05.000Z"
+      }
+    ]
+  }
+}
+```
+
+Internal prompt templates are not returned.
 
 ---
 
@@ -390,6 +482,8 @@ Returns a specific chat session with all messages.
 /chat/messages
 ```
 
+Authentication required. Supports context-aware follow-up questions — the last 20 messages from the session are included as context for the AI.
+
 ### Request
 
 ```json
@@ -399,17 +493,28 @@ Returns a specific chat session with all messages.
 }
 ```
 
-### Response
+Validation: `sessionId` is required, `message` must be 1–10,000 characters.
+
+### Response (201 Created)
 
 ```json
 {
   "success": true,
   "message": "AI response generated.",
   "data": {
-    "reply": "Newton's First Law states..."
+    "reply": "Newton's First Law states that an object at rest stays at rest...",
+    "message": {
+      "id": "MSG_ID",
+      "sessionId": "SESSION_ID",
+      "role": "assistant",
+      "content": "Newton's First Law states that an object at rest stays at rest...",
+      "createdAt": "2026-07-19T12:00:05.000Z"
+    }
   }
 }
 ```
+
+The first message in a session automatically updates the session title (truncated to 60 characters).
 
 ---
 
@@ -421,7 +526,18 @@ Returns a specific chat session with all messages.
 /chat/sessions/:id
 ```
 
-Deletes the chat session and its messages.
+Authentication required. Deletes the chat session and all its messages.
+
+A session belonging to another user returns `403 Forbidden`.
+
+### Response
+
+```json
+{
+  "success": true,
+  "message": "Chat session deleted."
+}
+```
 
 ---
 

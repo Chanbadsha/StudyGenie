@@ -1,5 +1,7 @@
 import { createNotesPrompt } from './notes.prompt';
+import { buildChatContext as assembleChatContext, createChatPrompt } from './chat.prompt';
 import type { NotesPromptInput } from '../validators/ai.validator';
+import type { IChatMessage } from '../models/chat-message.model';
 
 function normalizePromptValue(value: string): string {
   return value
@@ -17,4 +19,12 @@ export function buildNotesPrompt(input: NotesPromptInput): string {
     learningGoal: normalizePromptValue(input.learningGoal),
     outputLength: input.outputLength,
   });
+}
+
+export function buildChatContext(messages: IChatMessage[]): string {
+  return assembleChatContext(messages);
+}
+
+export function buildChatPrompt(context: string, userMessage: string): string {
+  return createChatPrompt(context, normalizePromptValue(userMessage));
 }

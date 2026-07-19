@@ -1,1 +1,1 @@
-export { buildNotesPrompt } from './prompt-builder';
+export { buildNotesPrompt, buildChatContext, buildChatPrompt } from './prompt-builder';

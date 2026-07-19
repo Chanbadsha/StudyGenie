@@ -1,28 +1,38 @@
 import api from './api';
+import type { ChatSession, ChatSessionDetail, SendMessageResponse, SendMessageInput, CreateSessionInput } from '@/types/chat';
+
+interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+}
+
+interface SessionsData {
+  sessions: ChatSession[];
+}
 
 export const chatService = {
-  async getSessions() {
-    const response = await api.get('/chat/sessions');
-    return response.data;
+  async getSessions(): Promise<ChatSession[]> {
+    const response = await api.get<ApiResponse<SessionsData>>('/chat/sessions');
+    return response.data.data.sessions;
   },
 
-  async getSession(id: string) {
-    const response = await api.get(`/chat/sessions/${id}`);
-    return response.data;
+  async getSession(id: string): Promise<ChatSessionDetail> {
+    const response = await api.get<ApiResponse<ChatSessionDetail>>(`/chat/sessions/${id}`);
+    return response.data.data;
   },
 
-  async createSession() {
-    const response = await api.post('/chat/sessions');
-    return response.data;
+  async createSession(input?: CreateSessionInput): Promise<ChatSession> {
+    const response = await api.post<ApiResponse<ChatSession>>('/chat/sessions', input ?? {});
+    return response.data.data;
   },
 
-  async sendMessage(data: { sessionId: string; message: string }) {
-    const response = await api.post('/chat/messages', data);
-    return response.data;
+  async sendMessage(data: SendMessageInput): Promise<SendMessageResponse> {
+    const response = await api.post<ApiResponse<SendMessageResponse>>('/chat/messages', data);
+    return response.data.data;
   },
 
-  async deleteSession(id: string) {
-    const response = await api.delete(`/chat/sessions/${id}`);
-    return response.data;
+  async deleteSession(id: string): Promise<void> {
+    await api.delete<ApiResponse<undefined>>(`/chat/sessions/${id}`);
   },
 };
