@@ -327,6 +327,9 @@ Finalize
 
 Project documentation completed.
 
+1. Give Frontend Live URL
+2. Give Backend Live URL
+
 ---
 
 # Phase 15 — Final Review

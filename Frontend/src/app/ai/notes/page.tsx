@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, Clock3, FileText, RefreshCw, Sparkles } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { Container } from '@/components/layout/container';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +15,11 @@ import { Heading, Text } from '@/components/ui/typography';
 import { EmptyState } from '@/components/common/empty-state';
 import { ErrorState } from '@/components/common/error-state';
 import { Spinner } from '@/components/common/loading';
-import { MarkdownRenderer } from '@/components/common/markdown-renderer';
+
+const MarkdownRenderer = dynamic(() => import('@/components/common/markdown-renderer').then((mod) => mod.MarkdownRenderer), {
+  ssr: false,
+  loading: () => <div className="h-48 animate-pulse rounded-lg bg-surface" />,
+});
 import { FadeIn, StaggerContainer, StaggerItem } from '@/components/common/motion-wrapper';
 import { useAIHistory, useAINotes } from '@/hooks/useAI';
 import { useSession } from '@/hooks/useAuth';
@@ -181,13 +186,6 @@ export default function AINotesPage() {
 
                   <hr className="border-border" />
 
-                  {generateNotes.error && (
-                    <FadeIn>
-                      <p className="rounded-lg bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">
-                        {getApiErrorMessage(generateNotes.error, 'Could not generate notes. Please try again.')}
-                      </p>
-                    </FadeIn>
-                  )}
                 </CardContent>
                 <CardFooter>
                   <Button type="submit" variant="primary" isLoading={isGenerating} fullWidth>

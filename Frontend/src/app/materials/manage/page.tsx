@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, BookOpen, Calendar, Eye, Plus, Trash2 } from 'lucide-react';
 import { useDeleteMaterial, useMyMaterials } from '@/hooks/useStudyMaterials';
-import { getApiErrorMessage } from '@/utils/api-error';
 import { Container } from '@/components/layout/container';
 import { Heading, Text } from '@/components/ui/typography';
 import { Button } from '@/components/ui/button';
@@ -54,12 +53,6 @@ export default function ManageMaterialsPage() {
           </Button>
         </Link>
       </div>
-
-      {deleteMaterial.error && (
-        <p className="mb-6 rounded-lg bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">
-          {getApiErrorMessage(deleteMaterial.error, 'Could not delete this material. Please try again.')}
-        </p>
-      )}
 
       {materialsQuery.isLoading ? (
         <SkeletonCard count={6} />

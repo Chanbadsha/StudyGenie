@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 import { authService, type BetterAuthSession } from '@/services/auth.service';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/constants/routes';
@@ -48,8 +49,12 @@ export function useLogin() {
     mutationFn: (data: { email: string; password: string }) =>
       authService.login(data),
     onSuccess: () => {
+      toast.success('Welcome back!');
       queryClient.invalidateQueries({ queryKey: ['session'] });
       router.push(ROUTES.dashboard);
+    },
+    onError: (error) => {
+      toast.error((error as { message?: string })?.message || 'Invalid email or password.');
     },
   });
 }
@@ -62,8 +67,12 @@ export function useRegister() {
     mutationFn: (data: { name: string; email: string; password: string }) =>
       authService.register(data),
     onSuccess: () => {
+      toast.success('Account created!');
       queryClient.invalidateQueries({ queryKey: ['session'] });
       router.push(ROUTES.dashboard);
+    },
+    onError: (error) => {
+      toast.error((error as { message?: string })?.message || 'Registration failed.');
     },
   });
 }
@@ -75,8 +84,12 @@ export function useLogout() {
   return useMutation({
     mutationFn: () => authService.logout(),
     onSuccess: () => {
+      toast.success('Signed out');
       queryClient.removeQueries({ queryKey: ['session'] });
       router.push(ROUTES.home);
+    },
+    onError: () => {
+      toast.error('Could not sign out. Please try again.');
     },
   });
 }

@@ -1,6 +1,8 @@
 'use client';
 
+import { useMemo } from 'react';
 import { BookOpen, Sparkles, Brain, Bot, FolderOpen, Plus, ArrowRight, Clock, BarChart3 } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { Container } from '@/components/layout/container';
 import { Heading, Text } from '@/components/ui/typography';
@@ -9,7 +11,13 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { SkeletonCard, Spinner } from '@/components/common/loading';
 import { EmptyState } from '@/components/common/empty-state';
 import { ErrorState } from '@/components/common/error-state';
-import { SubjectChart } from '@/components/analytics/subject-chart';
+
+const SubjectChart = dynamic(() => import('@/components/analytics/subject-chart').then((mod) => mod.SubjectChart), {
+  ssr: false,
+  loading: () => (
+    <div className="h-80 animate-pulse rounded-xl bg-surface" />
+  ),
+});
 import { ROUTES } from '@/constants/routes';
 import { useAIHistory } from '@/hooks/useAI';
 import { useSession } from '@/hooks/useAuth';
@@ -61,8 +69,8 @@ export default function DashboardPage() {
   const materialsQuery = useMyMaterials({ limit: 5, sort: 'newest' }, !!user);
   const aiHistoryQuery = useAIHistory(!!user);
   const dashboardStatsQuery = useDashboardStats(!!user);
-  const recentMaterials = materialsQuery.data?.materials ?? [];
-  const stats = dashboardStatsQuery.data;
+  const recentMaterials = useMemo(() => materialsQuery.data?.materials ?? [], [materialsQuery.data]);
+  const stats = useMemo(() => dashboardStatsQuery.data, [dashboardStatsQuery.data]);
 
   if (isLoading) {
     return (

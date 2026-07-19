@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic';
 import { Container } from '@/components/layout/container';
 import { Heading, Text } from '@/components/ui/typography';
 import { Button } from '@/components/ui/button';
@@ -7,8 +8,14 @@ import { ROUTES } from '@/constants/routes';
 import { FeatureCard } from '@/components/cards/feature-card';
 import { StatisticCard } from '@/components/cards/statistic-card';
 import { TestimonialCard } from '@/components/cards/testimonial-card';
-import { PopularMaterialsSection } from '@/components/sections/popular-materials-section';
-import { NewsletterSection } from '@/components/sections/newsletter-section';
+
+const PopularMaterialsSection = dynamic(() => import('@/components/sections/popular-materials-section').then((mod) => mod.PopularMaterialsSection), {
+  loading: () => <section className="py-16 lg:py-24"><div className="h-64 animate-pulse rounded-xl bg-surface" /></section>,
+});
+
+const NewsletterSection = dynamic(() => import('@/components/sections/newsletter-section').then((mod) => mod.NewsletterSection), {
+  loading: () => <section className="border-y border-border"><div className="h-48 animate-pulse bg-surface" /></section>,
+});
 import { FadeIn, StaggerContainer, StaggerItem } from '@/components/common/motion-wrapper';
 
 const FEATURES = [

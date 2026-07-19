@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+import { Toaster } from 'react-hot-toast';
 import { Providers } from '@/providers';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
@@ -33,6 +34,26 @@ export default function RootLayout({
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: 'var(--color-surface)',
+                color: 'var(--color-foreground)',
+                border: '1px solid var(--color-border)',
+                fontSize: '0.875rem',
+                borderRadius: '0.75rem',
+                padding: '0.75rem 1rem',
+              },
+              success: {
+                iconTheme: { primary: 'var(--color-success)', secondary: 'white' },
+              },
+              error: {
+                iconTheme: { primary: 'var(--color-danger)', secondary: 'white' },
+              },
+            }}
+          />
         </Providers>
       </body>
     </html>

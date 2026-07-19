@@ -1,8 +1,12 @@
+import { memo, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Clock, User } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatRelativeTime } from '@/utils/format-date';
 import { truncateText } from '@/utils/truncate-text';
+
+const CARD_PLACEHOLDER = 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600&h=300&fit=crop';
 
 interface StudyMaterialCardProps {
   id: string;
@@ -22,7 +26,7 @@ const difficultyColorMap: Record<string, string> = {
   Advanced: 'bg-danger/10 text-danger',
 };
 
-function StudyMaterialCard({
+const StudyMaterialCard = memo(function StudyMaterialCard({
   id,
   title,
   subject,
@@ -34,18 +38,23 @@ function StudyMaterialCard({
   className = '',
 }: StudyMaterialCardProps) {
   const difficultyClass = difficultyColorMap[difficulty] ?? 'bg-surface text-muted';
+  const [imgFailed, setImgFailed] = useState(false);
+  const imageSrc = coverImage && !imgFailed ? coverImage : CARD_PLACEHOLDER;
 
   return (
     <Link href={`/materials/${id}`}>
       <Card className={`group h-full transition-shadow hover:shadow-medium ${className}`}>
-        {coverImage && (
-          <div
-            className="h-36 w-full rounded-t-lg bg-cover bg-center"
-            style={{ backgroundImage: `url(${coverImage})` }}
-            role="img"
-            aria-label={title}
+        <div className="relative h-36 w-full">
+          <Image
+            src={imageSrc}
+            alt={title}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="rounded-t-lg object-cover"
+            loading="lazy"
+            onError={() => setImgFailed(true)}
           />
-        )}
+        </div>
         <CardContent className="flex flex-col gap-3 p-5">
           <div className="flex items-center gap-2">
             <span className="rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
@@ -80,7 +89,7 @@ function StudyMaterialCard({
       </Card>
     </Link>
   );
-}
+});
 
 export { StudyMaterialCard };
 export type { StudyMaterialCardProps };

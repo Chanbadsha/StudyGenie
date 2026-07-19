@@ -3,13 +3,18 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, Clock3, Sparkles, BookOpen } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { Container } from '@/components/layout/container';
 import { Heading, Text } from '@/components/ui/typography';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Spinner } from '@/components/common/loading';
 import { ErrorState } from '@/components/common/error-state';
-import { MarkdownRenderer } from '@/components/common/markdown-renderer';
+
+const MarkdownRenderer = dynamic(() => import('@/components/common/markdown-renderer').then((mod) => mod.MarkdownRenderer), {
+  ssr: false,
+  loading: () => <div className="h-48 animate-pulse rounded-lg bg-surface" />,
+});
 import { useAIHistory } from '@/hooks/useAI';
 import { useSession } from '@/hooks/useAuth';
 import { formatDate } from '@/utils/format-date';

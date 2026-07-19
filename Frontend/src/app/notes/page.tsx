@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, memo } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Search, Sparkles, FileText, Clock3, BookOpen, Plus } from 'lucide-react';
 import { Container } from '@/components/layout/container';
@@ -30,7 +30,7 @@ const lengthLabelMap: Record<string, string> = {
   Long: 'Long',
 };
 
-function NotesCard({ note }: { note: AIGeneration }) {
+const NotesCard = memo(function NotesCard({ note }: { note: AIGeneration }) {
   const difficultyClass = difficultyColorMap[note.difficulty] ?? 'bg-surface text-muted';
 
   return (
@@ -71,7 +71,7 @@ function NotesCard({ note }: { note: AIGeneration }) {
       </Card>
     </Link>
   );
-}
+});
 
 export default function NotesPage() {
   const sessionQuery = useSession();
@@ -80,16 +80,20 @@ export default function NotesPage() {
 
   const debouncedSearch = useDebounce(searchInput, 300);
 
-  const allNotes = historyQuery.data ?? [];
+  const allNotes = useMemo(() => historyQuery.data ?? [], [historyQuery.data]);
 
-  const filteredNotes = debouncedSearch
-    ? allNotes.filter(
-        (note) =>
-          note.topic.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-          note.subject.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-          note.learningGoal.toLowerCase().includes(debouncedSearch.toLowerCase())
-      )
-    : allNotes;
+  const filteredNotes = useMemo(
+    () =>
+      debouncedSearch
+        ? allNotes.filter(
+            (note) =>
+              note.topic.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+              note.subject.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+              note.learningGoal.toLowerCase().includes(debouncedSearch.toLowerCase())
+          )
+        : allNotes,
+    [allNotes, debouncedSearch]
+  );
 
   return (
     <Container as="section" className="py-8 lg:py-12">

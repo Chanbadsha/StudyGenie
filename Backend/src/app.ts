@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import compression from 'compression';
 import { env } from './config/env';
 import routes from './routes/index';
 import { errorHandler } from './middlewares/error.middleware';
@@ -9,6 +10,7 @@ import { notFoundHandler } from './middlewares/not-found.middleware';
 const app = express();
 
 app.use(helmet());
+app.use(compression());
 app.use(cors({
   origin: env.clientUrl,
   credentials: true,

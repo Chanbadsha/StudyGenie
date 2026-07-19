@@ -58,11 +58,6 @@ export default function RegisterPage() {
               error={errors.password?.message}
               {...register('password')}
             />
-            {registerMutation.error && (
-              <Text size="sm" className="text-danger">
-                {(registerMutation.error as { message?: string })?.message || 'Registration failed.'}
-              </Text>
-            )}
             <Button
               type="submit"
               variant="primary"

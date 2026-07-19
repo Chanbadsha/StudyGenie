@@ -2,60 +2,69 @@
 
 ## Workspace
 
-- `Frontend/` and `Backend/` are independent npm projects with separate `package.json` and lockfiles. The repository root has no package scripts or workspace manifest.
-- Run package commands with the package directory as the working directory. Backend `dotenv.config()` reads `.env` from the process working directory, so do not launch `Backend/src/server.ts` from the repository root.
-- Frontend entrypoints are under `Frontend/src/app` (Next.js App Router); API calls belong in `Frontend/src/services`.
-- Backend startup is `Backend/src/server.ts`; Express middleware is wired in `Backend/src/app.ts`, and routes are mounted under `/api/v1` in `Backend/src/routes/index.ts`.
+- `Frontend/` and `Backend/` are independent npm projects. The repository root has no package scripts or workspace manifest.
+- Run package commands with the package directory as the working directory. Backend `dotenv.config()` reads `.env` from the process working directory, so do not launch from the repo root.
+- Frontend entrypoints: `Frontend/src/app` (Next.js App Router). API calls live in `Frontend/src/services`, client instance at `Frontend/src/services/api.ts` (Axios, `withCredentials: true`).
+- Backend entrypoints: `Backend/src/server.ts` → `Backend/src/app.ts` → routes mounted under `/api/v1` in `Backend/src/routes/index.ts`.
 
 ## Commands
 
 Run these from `Frontend/`:
 
 ```text
-npm ci
-npm run dev       # http://localhost:3000
-npm run lint
-npx tsc --noEmit
-npm run build
-npm start         # requires a successful build
+npm ci                          # install
+npm run dev                     # next dev, http://localhost:3000
+npm run lint                    # eslint
+npx tsc --noEmit                # typecheck only
+npm run build                   # full production build
+npm start                       # serve built app
 ```
 
 Run these from `Backend/`:
 
 ```text
 npm ci
-npm run dev       # tsx watch, http://localhost:5000
-npm run lint
-npm run typecheck
-npm run build
-npm start         # serves dist/server.js
+npm run dev                     # tsx watch src/server.ts, http://localhost:5000
+npm run lint                    # eslint src
+npm run typecheck               # tsc --noEmit (also checks unused locals/params)
+npm run build                   # tsc → dist/
+npm start                       # node dist/server.js
+npm run seed                    # tsx src/seed.ts — seed database
 ```
 
-- Neither package defines a test script or test runner. Use `docs/15-Test-Cases.md` for the manual test matrix and start MongoDB plus both dev servers for integration/auth testing.
-- The backend must connect to MongoDB before it listens. Missing configuration or a failed database connection exits the process.
-- Verify backend availability at `GET http://localhost:5000/api/v1/health`.
+- No test runner configured. Use `docs/15-Test-Cases.md` for manual test matrix. Start MongoDB + both dev servers for integration/auth testing.
+- Backend connects to MongoDB before listening; exits on failure. Health: `GET /api/v1/health`.
+- Backend uses **in-memory** rate limiting (`Backend/src/middlewares/rate-limit.middleware.ts`) and response caching (`Backend/src/middlewares/cache.middleware.ts`). No Redis. Cache and rate-limit state are per-process and lost on restart.
 
 ## Environment
 
-- Create `Backend/.env` from `Backend/.env.example`. `Backend/src/config/env.ts` requires `PORT`, `CLIENT_URL`, `MONGODB_URI`, `DATABASE_NAME`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and `GEMINI_API_KEY` at startup.
-- Google OAuth is enabled only when both `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set. `GEMINI_API_KEY` is still required even when working on non-AI routes.
-- Frontend API configuration is `NEXT_PUBLIC_API_URL`, defaulting to `http://localhost:5000/api/v1`; local frontend settings belong in `Frontend/.env.local`.
-- `Frontend/.gitignore` ignores all `.env*` files, including `.env.example`; do not assume a frontend example file is tracked. Never commit secrets.
+- Create `Backend/.env` from `Backend/.env.example`. Required at startup: `PORT`, `CLIENT_URL`, `MONGODB_URI`, `DATABASE_NAME`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GEMINI_API_KEY`.
+- Google OAuth is enabled only when both `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set.
+- Frontend API base: `NEXT_PUBLIC_API_URL` (defaults to `http://localhost:5000/api/v1` in `Frontend/src/constants/api.ts`). Local frontend env in `Frontend/.env.local`.
+- `Frontend/.gitignore` ignores all `.env*` files, including `.env.example`. Never commit secrets.
 
-## API And Auth
+## API / Routes
 
-- The frontend must call the Express API and must never call Gemini directly. Backend AI integrations belong behind API routes and keep credentials server-side.
-- Better Auth is mounted at `/api/v1/auth`. The frontend currently uses `/sign-up/email`, `/sign-in/email`, `/sign-in/social`, `/get-session`, and `/sign-out`, not the placeholder `/register` and `/login` paths shown in older API prose.
-- Auth is cookie-based. Keep Axios `withCredentials: true`, Express CORS `credentials: true`, and matching `CLIENT_URL` when changing auth or API code.
-- Current route wiring exposes health, Better Auth, and material routes. `Backend/src/routes/material.routes.ts` currently implements public `GET /materials` and `GET /materials/:id`; do not assume planned CRUD, AI, chat, analytics, or user routes exist without checking source.
-- Material list query validation accepts `page`, `limit`, `search`, `subject`, `difficulty` (`Beginner`, `Intermediate`, `Advanced`), and `sort` (`newest`, `oldest`, `az`, `za`).
-- Backend validation uses Zod middleware and responses use the `success`, `message`, `data`/`errors` shape from `Backend/src/utils/api-response.ts`.
+All routes mount under `/api/v1`:
 
-## Documentation And Conventions
+| Prefix | Auth | Implemented endpoints |
+|--------|------|-----------------------|
+| `/auth` | — | Better Auth handler (email sign-up/in, Google OAuth, session, sign-out) |
+| `/ai` | required | `POST /notes`, `GET /history`, `DELETE /history/:id` |
+| `/chat` | required | `POST /sessions`, `GET /sessions`, `GET /sessions/:id`, `POST /messages`, `DELETE /sessions/:id` |
+| `/materials` | mixed | `GET /` (public, paginated), `GET /mine` (auth), `GET /:id` (public), `POST /` (auth), `DELETE /:id` (auth) |
+| `/analytics` | required | `GET /dashboard`, `GET /subjects`, `GET /progress` |
+| `/blog` | — | `GET /`, `GET /:slug` |
 
-- Treat package scripts and source route wiring as the executable source of truth. `docs/06-API.md` and the roadmap include planned endpoints that may not be implemented yet.
-- Read the relevant document before changing behavior: `docs/04-Architecture.md`, `docs/06-API.md`, `docs/14-Development-Phases.md`, `docs/15-Test-Cases.md`, or `docs/16-Environment.md`.
-- Preserve the frontend/backend boundary: UI components render, frontend services fetch, and backend routes/controllers own validation and business behavior.
-- TypeScript is strict in both packages; backend additionally rejects unused locals/parameters at typecheck time and rejects explicit `any` in ESLint.
-- Do not commit `.env` files, build output, `.next/`, `dist/`, dependencies, or logs. Update API/environment documentation when implementation changes those contracts.
-- When changing Next.js code, also follow `Frontend/AGENTS.md` and read the relevant guide under `Frontend/node_modules/next/dist/docs/` before relying on Next-specific behavior.
+- Frontend auth endpoints used (`auth.service.ts`): `/auth/sign-up/email`, `/auth/sign-in/email`, `/auth/sign-in/social`, `/auth/get-session`, `/auth/sign-out`.
+- Query params for `GET /materials` and `GET /materials/mine`: `page`, `limit` (positive ints), `search` (max 100 chars), `subject` (max 50), `difficulty` (`Beginner`|`Intermediate`|`Advanced`), `sort` (`newest`|`oldest`|`az`|`za`).
+- Validation: Zod middleware (`Backend/src/middlewares/validate.middleware.ts`). Responses use `{ success, message, data?, errors? }` shape from `Backend/src/utils/api-response.ts`.
+- Rate limits applied per-route: e.g. AI notes 20/hr, chat messages 60/hr, materials 30-60/min. Auth routes 30/min.
+
+## Conventions
+
+- Treat package scripts and route source (`Backend/src/routes/`) as executable truth over `docs/` prose. `docs/06-API.md` and `docs/14-Development-Phases.md` describe planned endpoints that may not match current wiring.
+- UI renders, frontend services fetch, backend owns validation + business logic. Frontend never calls Gemini directly.
+- Backend TypeScript: strict, `noUnusedLocals`, `noUnusedParameters`, `noImplicitAny`, ESLint `no-explicit-any` error. Frontend: strict but less restrictive lint.
+- Ignored by `.gitignore` (root and package-local): `.env*`, `node_modules/`, `.next/`, `dist/`, `*.log`, build output.
+- When changing Next.js code, also read `Frontend/AGENTS.md` and check `Frontend/node_modules/next/dist/docs/` for API changes.

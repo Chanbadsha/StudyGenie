@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Quote } from 'lucide-react';
 
@@ -9,7 +10,7 @@ interface TestimonialCardProps {
   className?: string;
 }
 
-function TestimonialCard({ quote, author, role, avatar, className = '' }: TestimonialCardProps) {
+const TestimonialCard = memo(function TestimonialCard({ quote, author, role, avatar, className = '' }: TestimonialCardProps) {
   return (
     <Card className={`h-full ${className}`}>
       <CardContent className="flex flex-col gap-4 py-6">
@@ -29,7 +30,7 @@ function TestimonialCard({ quote, author, role, avatar, className = '' }: Testim
       </CardContent>
     </Card>
   );
-}
+});
 
 export { TestimonialCard };
 export type { TestimonialCardProps };

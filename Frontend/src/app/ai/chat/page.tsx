@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, memo } from 'react';
 import {
   ArrowLeft,
   Bot,
@@ -37,7 +37,7 @@ const SUGGESTED_PROMPTS = [
   'Walk me through solving a quadratic equation step by step.',
 ];
 
-function MessageBubble({ message }: { message: ChatMessage }) {
+const MessageBubble = memo(function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === 'user';
   return (
     <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`}>
@@ -60,7 +60,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
       </div>
     </div>
   );
-}
+});
 
 function TypingIndicator() {
   return (
@@ -105,7 +105,7 @@ function NewSessionView({ onSelectPrompt }: { onSelectPrompt: (prompt: string) =
   );
 }
 
-function SessionItem({
+const SessionItem = memo(function SessionItem({
   session,
   isActive,
   isDeleting,
@@ -148,7 +148,7 @@ function SessionItem({
       </Button>
     </div>
   );
-}
+});
 
 export default function AIChatPage() {
   const sessionsQuery = useChatSessions(true);
@@ -353,12 +353,6 @@ export default function AIChatPage() {
 
                     {sendMessage.isPending && <TypingIndicator />}
                   </>
-                )}
-
-                {sendMessage.error && (
-                  <p className="rounded-lg bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">
-                    {getApiErrorMessage(sendMessage.error, 'Failed to send message. Please try again.')}
-                  </p>
                 )}
 
                 <div ref={messagesEndRef} />

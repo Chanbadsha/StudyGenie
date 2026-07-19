@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginSchema, type LoginSchemaType } from '@/validations/login.schema';
@@ -13,12 +14,19 @@ import Link from 'next/link';
 import { ROUTES } from '@/constants/routes';
 import { authService } from '@/services/auth.service';
 
+const DEMO_CREDENTIALS = {
+  email: 'demo@studygenie.com',
+  password: 'Demo@123',
+};
+
 export default function LoginPage() {
   const login = useLogin();
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<LoginSchemaType>({
     resolver: zodResolver(LoginSchema),
@@ -27,6 +35,18 @@ export default function LoginPage() {
   const onSubmit = (data: LoginSchemaType) => {
     login.mutate(data);
   };
+
+  async function handleDemoLogin() {
+    setIsDemoLoading(true);
+    setValue('email', DEMO_CREDENTIALS.email);
+    setValue('password', DEMO_CREDENTIALS.password);
+    try {
+      await authService.register({ name: 'Demo User', ...DEMO_CREDENTIALS });
+    } catch {
+      // demo user may already exist — proceed to login
+    }
+    login.mutate(DEMO_CREDENTIALS);
+  }
 
   return (
     <Container as="section" className="flex min-h-[calc(100vh-8rem)] items-center justify-center py-12">
@@ -51,11 +71,6 @@ export default function LoginPage() {
               error={errors.password?.message}
               {...register('password')}
             />
-            {login.error && (
-              <Text size="sm" className="text-danger">
-                {(login.error as { message?: string })?.message || 'Invalid email or password.'}
-              </Text>
-            )}
             <Button
               type="submit"
               variant="primary"
@@ -72,19 +87,32 @@ export default function LoginPage() {
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-background px-2 text-muted">or continue with</span>
+              <span className="bg-background px-2 text-muted">or</span>
             </div>
           </div>
 
-          <Button
-            type="button"
-            variant="outline"
-            size="lg"
-            fullWidth
-            onClick={() => authService.googleLogin()}
-          >
-            Continue with Google
-          </Button>
+          <div className="flex flex-col gap-3">
+            <Button
+              type="button"
+              variant="secondary"
+              size="lg"
+              fullWidth
+              isLoading={isDemoLoading}
+              onClick={handleDemoLogin}
+            >
+              Demo Login
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              fullWidth
+              onClick={() => authService.googleLogin()}
+            >
+              Continue with Google
+            </Button>
+          </div>
 
           <Text size="sm" className="mt-6 text-center text-muted">
             Don&apos;t have an account?{' '}

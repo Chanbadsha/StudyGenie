@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { materialService } from '@/services/material.service';
 import type { MaterialQueryParams } from '@/services/material.service';
@@ -25,10 +26,14 @@ export function useCreateMaterial() {
   return useMutation({
     mutationFn: (data: CreateMaterialInput) => materialService.create(data),
     onSuccess: async () => {
+      toast.success('Material created!');
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['materials'] }),
         queryClient.invalidateQueries({ queryKey: ['my-materials'] }),
       ]);
+    },
+    onError: () => {
+      toast.error('Could not create this material. Please try again.');
     },
   });
 }
@@ -39,10 +44,14 @@ export function useDeleteMaterial() {
   return useMutation({
     mutationFn: (id: string) => materialService.delete(id),
     onSuccess: async () => {
+      toast.success('Material deleted!');
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['materials'] }),
         queryClient.invalidateQueries({ queryKey: ['my-materials'] }),
       ]);
+    },
+    onError: () => {
+      toast.error('Could not delete this material. Please try again.');
     },
   });
 }

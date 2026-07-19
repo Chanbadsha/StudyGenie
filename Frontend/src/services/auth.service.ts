@@ -73,6 +73,7 @@ export const authService = {
     const response = await api.post('/auth/sign-out');
     return response.data;
   },
+
 };
 
 export type { BetterAuthSession };

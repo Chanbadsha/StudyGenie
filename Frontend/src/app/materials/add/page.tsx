@@ -4,16 +4,16 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, BookOpen } from 'lucide-react';
 import { CreateMaterialSchema, type CreateMaterialSchemaType } from '@/validations/material.schema';
 import { useCreateMaterial } from '@/hooks/useStudyMaterials';
-import { getApiErrorMessage } from '@/utils/api-error';
 import { Container } from '@/components/layout/container';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Heading } from '@/components/ui/typography';
+import { Heading, Text } from '@/components/ui/typography';
+import { FadeIn } from '@/components/common/motion-wrapper';
 import { SUBJECTS } from '@/constants/subjects';
 import { DIFFICULTY_LEVELS } from '@/constants/difficulty';
 import { ROUTES } from '@/constants/routes';
@@ -68,27 +68,42 @@ export default function AddMaterialPage() {
   }
 
   return (
-    <Container as="section" className="py-8 lg:py-12">
-      <Link
-        href={ROUTES.manageMaterials}
-        className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" />
-        Back to Manage Materials
-      </Link>
+    <>
+      <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-primary/5 via-background to-surface">
+        <div className="absolute inset-0 -z-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 25% 50%, var(--color-primary) 0%, transparent 50%), radial-gradient(circle at 75% 50%, var(--color-primary) 0%, transparent 50%)' }} />
+        <Container as="div" className="relative z-10 py-12 lg:py-16">
+          <FadeIn>
+            <Link
+              href={ROUTES.manageMaterials}
+              className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-foreground"
+            >
+              <ArrowLeft className="size-4" />
+              Back to Manage Materials
+            </Link>
+            <div className="flex flex-col items-center text-center">
+              <div className="mb-4 inline-flex size-14 items-center justify-center rounded-2xl bg-primary/10 shadow-sm">
+                <BookOpen className="size-7 text-primary" />
+              </div>
+              <Heading level={1}>Add Study Material</Heading>
+              <div className="mt-2 flex justify-center">
+                <Text size="base" className="max-w-xl text-center text-muted">
+                  Create a clear, useful resource for your next study session. Share your knowledge with the community.
+                </Text>
+              </div>
+            </div>
+          </FadeIn>
+        </Container>
+      </section>
 
-      <div className="mb-8">
-        <Heading level={1}>Add Study Material</Heading>
-        <p className="mt-1 text-sm text-muted">Create a clear, useful resource for your next study session.</p>
-      </div>
-
-      <Card className="mx-auto max-w-3xl">
-        <CardHeader>
-          <CardTitle>Material details</CardTitle>
-          <CardDescription>Required fields are marked with an asterisk.</CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <CardContent className="flex flex-col gap-5">
+      <Container as="section" className="py-10 lg:py-14">
+        <FadeIn y={16}>
+          <Card className="mx-auto max-w-3xl">
+            <CardHeader>
+              <CardTitle>Material details</CardTitle>
+              <CardDescription>Required fields are marked with an asterisk.</CardDescription>
+            </CardHeader>
+            <form onSubmit={handleSubmit(onSubmit)} noValidate>
+              <CardContent className="flex flex-col gap-5">
             <Input
               label="Title"
               placeholder="Introduction to Algebra"
@@ -149,11 +164,6 @@ export default function AddMaterialPage() {
               {...register('coverImage')}
             />
 
-            {createMaterial.error && (
-              <p className="rounded-lg bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">
-                {getApiErrorMessage(createMaterial.error, 'Could not create this material. Please try again.')}
-              </p>
-            )}
           </CardContent>
           <CardFooter className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <Link href={ROUTES.manageMaterials} className="w-full sm:w-auto">
@@ -171,9 +181,11 @@ export default function AddMaterialPage() {
               {!isSubmittingMaterial && <Save className="mr-1.5 size-4" />}
               Save Material
             </Button>
-          </CardFooter>
-        </form>
-      </Card>
-    </Container>
+              </CardFooter>
+            </form>
+          </Card>
+        </FadeIn>
+      </Container>
+    </>
   );
 }

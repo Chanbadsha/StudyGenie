@@ -1,12 +1,20 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { Container } from '@/components/layout/container';
 import { Heading, Text } from '@/components/ui/typography';
-import { Spinner } from '@/components/common/loading';
 import { ErrorState } from '@/components/common/error-state';
 import { ProtectedRoute } from '@/components/auth/protected-route';
-import { SubjectChart } from '@/components/analytics/subject-chart';
-import { ProgressChart } from '@/components/analytics/progress-chart';
+
+const SubjectChart = dynamic(() => import('@/components/analytics/subject-chart').then((mod) => mod.SubjectChart), {
+  ssr: false,
+  loading: () => <div className="h-80 animate-pulse rounded-xl bg-surface" />,
+});
+
+const ProgressChart = dynamic(() => import('@/components/analytics/progress-chart').then((mod) => mod.ProgressChart), {
+  ssr: false,
+  loading: () => <div className="h-80 animate-pulse rounded-xl bg-surface" />,
+});
 import { useSubjectDistribution, useLearningProgress } from '@/hooks/useAnalytics';
 
 function AnalyticsContent() {
@@ -17,7 +25,12 @@ function AnalyticsContent() {
     return (
       <Container as="section" className="py-8">
         <div className="mb-8">
-          <Spinner size="lg" label="Loading analytics..." />
+          <div className="mb-8 h-8 w-48 animate-pulse rounded bg-surface" />
+          <div className="h-4 w-72 animate-pulse rounded bg-surface" />
+        </div>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="h-80 animate-pulse rounded-xl bg-surface" />
+          <div className="h-80 animate-pulse rounded-xl bg-surface" />
         </div>
       </Container>
     );

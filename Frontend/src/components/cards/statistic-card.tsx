@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { memo, type ReactNode } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 
 interface StatisticCardProps {
@@ -8,7 +8,7 @@ interface StatisticCardProps {
   className?: string;
 }
 
-function StatisticCard({ icon, value, label, className = '' }: StatisticCardProps) {
+const StatisticCard = memo(function StatisticCard({ icon, value, label, className = '' }: StatisticCardProps) {
   return (
     <Card className={`text-center ${className}`}>
       <CardContent className="flex flex-col items-center gap-2 py-6">
@@ -20,7 +20,7 @@ function StatisticCard({ icon, value, label, className = '' }: StatisticCardProp
       </CardContent>
     </Card>
   );
-}
+});
 
 export { StatisticCard };
 export type { StatisticCardProps };

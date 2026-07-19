@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { memo, type ReactNode } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 interface FeatureCardProps {
@@ -8,7 +8,7 @@ interface FeatureCardProps {
   className?: string;
 }
 
-function FeatureCard({ icon, title, description, className = '' }: FeatureCardProps) {
+const FeatureCard = memo(function FeatureCard({ icon, title, description, className = '' }: FeatureCardProps) {
   return (
     <Card className={`h-full transition-shadow hover:shadow-medium ${className}`}>
       <CardHeader>
@@ -20,7 +20,7 @@ function FeatureCard({ icon, title, description, className = '' }: FeatureCardPr
       </CardHeader>
     </Card>
   );
-}
+});
 
 export { FeatureCard };
 export type { FeatureCardProps };

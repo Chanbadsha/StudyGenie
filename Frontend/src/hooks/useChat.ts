@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { chatService } from '@/services/chat.service';
 import type { SendMessageInput, ChatSessionDetail, ChatMessage } from '@/types/chat';
@@ -31,7 +32,11 @@ export function useCreateSession() {
       return session;
     },
     onSuccess: async () => {
+      toast.success('Chat session created!');
       await queryClient.invalidateQueries({ queryKey: CHAT_SESSIONS_KEY });
+    },
+    onError: () => {
+      toast.error('Could not create a new chat. Please try again.');
     },
   });
 }
@@ -62,6 +67,7 @@ export function useSendMessage() {
       return { previous };
     },
     onError: (_error, variables, context) => {
+      toast.error('Failed to send message. Please try again.');
       if (context?.previous) {
         queryClient.setQueryData(['chat-session', variables.sessionId], context.previous);
       }
@@ -81,7 +87,11 @@ export function useDeleteSession() {
   return useMutation({
     mutationFn: (id: string) => chatService.deleteSession(id),
     onSuccess: async () => {
+      toast.success('Session deleted.');
       await queryClient.invalidateQueries({ queryKey: CHAT_SESSIONS_KEY });
+    },
+    onError: () => {
+      toast.error('Could not delete session. Please try again.');
     },
   });
 }
