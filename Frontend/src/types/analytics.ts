@@ -2,15 +2,20 @@ export interface DashboardStats {
   totalMaterials: number;
   totalGenerations: number;
   totalChatSessions: number;
-  favoriteSubject?: string;
-  totalStudyMinutes: number;
+  subjectDistribution: SubjectDistribution[];
 }
 
-export interface ChartData {
-  labels: string[];
-  datasets: {
-    label: string;
-    data: number[];
-    color?: string;
-  }[];
+export interface SubjectDistribution {
+  subject: string;
+  count: number;
+}
+
+export interface LearningProgress {
+  monthlyMaterials: MonthlyData[];
+  monthlyGenerations: MonthlyData[];
+}
+
+export interface MonthlyData {
+  month: string;
+  count: number;
 }

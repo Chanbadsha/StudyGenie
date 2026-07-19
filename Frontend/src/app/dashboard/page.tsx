@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen, Sparkles, Brain, FolderOpen, Plus, ArrowRight, Clock } from 'lucide-react';
+import { BookOpen, Sparkles, Brain, FolderOpen, Plus, ArrowRight, Clock, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import { Container } from '@/components/layout/container';
 import { Heading, Text } from '@/components/ui/typography';
@@ -9,10 +9,12 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { SkeletonCard, Spinner } from '@/components/common/loading';
 import { EmptyState } from '@/components/common/empty-state';
 import { ErrorState } from '@/components/common/error-state';
+import { SubjectChart } from '@/components/analytics/subject-chart';
 import { ROUTES } from '@/constants/routes';
 import { useAIHistory } from '@/hooks/useAI';
 import { useSession } from '@/hooks/useAuth';
 import { useMyMaterials } from '@/hooks/useStudyMaterials';
+import { useDashboardStats } from '@/hooks/useAnalytics';
 import { formatDate } from '@/utils/format-date';
 
 const QUICK_ACTIONS = [
@@ -38,10 +40,10 @@ const QUICK_ACTIONS = [
     variant: 'secondary' as const,
   },
   {
-    icon: BookOpen,
-    title: 'Explore Materials',
-    description: 'Browse study materials from the community.',
-    href: ROUTES.explore,
+    icon: BarChart3,
+    title: 'Analytics',
+    description: 'View charts and learning progress.',
+    href: ROUTES.analytics,
     variant: 'outline' as const,
   },
 ];
@@ -50,7 +52,9 @@ export default function DashboardPage() {
   const { data: user, isLoading, isError, refetch } = useSession();
   const materialsQuery = useMyMaterials({ limit: 5, sort: 'newest' }, !!user);
   const aiHistoryQuery = useAIHistory(!!user);
+  const dashboardStatsQuery = useDashboardStats(!!user);
   const recentMaterials = materialsQuery.data?.materials ?? [];
+  const stats = dashboardStatsQuery.data;
 
   if (isLoading) {
     return (
@@ -116,7 +120,7 @@ export default function DashboardPage() {
             <CardDescription>Study sessions</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-foreground">0</p>
+            <p className="text-3xl font-bold text-foreground">{stats?.totalChatSessions ?? 0}</p>
           </CardContent>
         </Card>
       </div>
@@ -138,6 +142,13 @@ export default function DashboardPage() {
             </Link>
           ))}
         </div>
+      </div>
+
+      <div className="mt-10">
+        <SubjectChart
+          data={stats?.subjectDistribution ?? []}
+          isLoading={dashboardStatsQuery.isLoading}
+        />
       </div>
 
       <div className="mt-10">

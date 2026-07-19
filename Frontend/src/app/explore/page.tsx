@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Search, SlidersHorizontal, X, BookOpen } from 'lucide-react';
 import { Container } from '@/components/layout/container';
 import { Heading, Text } from '@/components/ui/typography';
@@ -17,19 +18,40 @@ import { SORT_OPTIONS, DEFAULT_PAGE_SIZE } from '@/constants/pagination';
 import type { StudyMaterialAuthor } from '@/types/study-material';
 
 function ExplorePage() {
-  const [search, setSearch] = useState('');
-  const [subject, setSubject] = useState('');
-  const [difficulty, setDifficulty] = useState('');
-  const [sort, setSort] = useState('newest');
-  const [page, setPage] = useState(1);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const urlSearch = searchParams.get('search') ?? '';
+  const subject = searchParams.get('subject') ?? '';
+  const difficulty = searchParams.get('difficulty') ?? '';
+  const sort = searchParams.get('sort') ?? 'newest';
+  const page = parseInt(searchParams.get('page') ?? '1', 10) || 1;
+
+  const [searchInput, setSearchInput] = useState(urlSearch);
   const [showFilters, setShowFilters] = useState(false);
 
-  const debouncedSearch = useDebounce(search, 300);
+  const debouncedSearch = useDebounce(searchInput, 300);
+
+  useEffect(() => {
+    if (debouncedSearch !== urlSearch) {
+      const params = new URLSearchParams(searchParams.toString());
+      if (debouncedSearch) {
+        params.set('search', debouncedSearch);
+      } else {
+        params.delete('search');
+      }
+      if (page !== 1) {
+        params.delete('page');
+      }
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }
+  }, [debouncedSearch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { data, isLoading, isError, refetch } = useStudyMaterials({
     page,
     limit: DEFAULT_PAGE_SIZE,
-    search: debouncedSearch || undefined,
+    search: urlSearch || undefined,
     subject: subject || undefined,
     difficulty: difficulty || undefined,
     sort: sort || undefined,
@@ -38,39 +60,43 @@ function ExplorePage() {
   const materials = data?.materials ?? [];
   const pagination = data?.pagination;
 
-  function handleFilterChange() {
-    setPage(1);
-  }
-
-  function handleSearchChange(value: string) {
-    setSearch(value);
-    setPage(1);
-  }
+  const updateParams = useCallback(
+    (updates: Record<string, string | undefined | null>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      for (const [key, value] of Object.entries(updates)) {
+        if (value === undefined || value === null || value === '') {
+          params.delete(key);
+        } else {
+          params.set(key, value);
+        }
+      }
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    },
+    [searchParams, router, pathname]
+  );
 
   function handleSubjectChange(value: string) {
-    setSubject(value);
-    handleFilterChange();
+    updateParams({ subject: value || null, page: null });
   }
 
   function handleDifficultyChange(value: string) {
-    setDifficulty(value);
-    handleFilterChange();
+    updateParams({ difficulty: value || null, page: null });
   }
 
   function handleSortChange(value: string) {
-    setSort(value);
-    handleFilterChange();
+    updateParams({ sort: value === 'newest' ? null : value, page: null });
+  }
+
+  function handlePageChange(newPage: number) {
+    updateParams({ page: newPage > 1 ? String(newPage) : null });
   }
 
   function clearFilters() {
-    setSearch('');
-    setSubject('');
-    setDifficulty('');
-    setSort('newest');
-    setPage(1);
+    setSearchInput('');
+    updateParams({ search: null, subject: null, difficulty: null, sort: null, page: null });
   }
 
-  const hasActiveFilters = search || subject || difficulty || sort !== 'newest';
+  const hasActiveFilters = !!(urlSearch || subject || difficulty || sort !== 'newest');
 
   return (
     <Container as="section" className="py-8 lg:py-12">
@@ -87,8 +113,8 @@ function ExplorePage() {
           <input
             type="text"
             placeholder="Search materials..."
-            value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             className="w-full rounded-lg border border-border bg-background py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             aria-label="Search materials"
           />
@@ -219,7 +245,7 @@ function ExplorePage() {
                 variant="outline"
                 size="sm"
                 isDisabled={page <= 1}
-                onClick={() => setPage(page - 1)}
+                onClick={() => handlePageChange(page - 1)}
               >
                 Previous
               </Button>
@@ -237,7 +263,7 @@ function ExplorePage() {
                       <Button
                         variant={p === page ? 'primary' : 'outline'}
                         size="sm"
-                        onClick={() => setPage(p)}
+                        onClick={() => handlePageChange(p)}
                       >
                         {p}
                       </Button>
@@ -249,7 +275,7 @@ function ExplorePage() {
                 variant="outline"
                 size="sm"
                 isDisabled={page >= pagination.totalPages}
-                onClick={() => setPage(page + 1)}
+                onClick={() => handlePageChange(page + 1)}
               >
                 Next
               </Button>
