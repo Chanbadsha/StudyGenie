@@ -21,14 +21,14 @@
     "express": "^4.21.2",
     "helmet": "^8.0.0",
     "mongoose": "^8.9.5",
-    "zod": "^4.4.0"
+    "zod": "^4.4.0",
+    "esbuild": "^0.28.1"
   },
   "devDependencies": {
     "@types/compression": "^1.8.1",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.5",
-    "esbuild": "^0.28.1",
     "eslint": "^9.18.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3",
