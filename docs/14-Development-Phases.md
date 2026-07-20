@@ -311,6 +311,9 @@ Tasks
 
 Production deployment completed.
 
+1. Give Frontend Live URL
+2. Give Backend Live URL
+
 ---
 
 # Phase 14 — Documentation
@@ -326,9 +329,6 @@ Finalize
 ### Deliverables
 
 Project documentation completed.
-
-1. Give Frontend Live URL
-2. Give Backend Live URL
 
 ---
 
