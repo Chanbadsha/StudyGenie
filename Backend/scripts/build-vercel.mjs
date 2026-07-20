@@ -7,7 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 console.log('Building Vercel bundle with esbuild...');
 
-const outfile = path.join(__dirname, '..', 'api', 'entry.js');
+const outfile = path.join(__dirname, '..', 'api', 'entry.bundle.js');
 
 await esbuild.build({
   entryPoints: [path.join(__dirname, '..', 'src', 'vercel-handler.ts')],
