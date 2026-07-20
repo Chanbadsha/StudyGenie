@@ -1,0 +1,14 @@
+{
+  "buildCommand": "npm run build && node scripts/build-vercel.mjs",
+  "outputDirectory": ".",
+  "installCommand": "npm ci",
+  "functions": {
+    "api/entry.js": {
+      "memory": 512,
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/entry" }
+  ]
+}
