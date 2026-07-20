@@ -1,4 +1,1 @@
-module.exports = async (req, res) => {
-  const handler = require('./entry.bundle');
-  return handler(req, res);
-};
+// Placeholder — overwritten by build script during Vercel deployment
