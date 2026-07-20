@@ -12,7 +12,7 @@ const app = express();
 app.use(helmet());
 app.use(compression());
 app.use(cors({
-  origin: env.clientUrl,
+  origin: env.allowedOrigins,
   credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));

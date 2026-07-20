@@ -6,6 +6,7 @@ interface EnvConfig {
   nodeEnv: string;
   port: number;
   clientUrl: string;
+  allowedOrigins: string[];
   mongodbUri: string;
   databaseName: string;
   betterAuthSecret: string;
@@ -32,10 +33,18 @@ for (const varName of requiredVars) {
   }
 }
 
+function parseOrigins(value: string): string[] {
+  return value
+    .split(',')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+}
+
 export const env: EnvConfig = {
   nodeEnv: process.env.NODE_ENV || 'development',
   port: parseInt(process.env.PORT || '5000', 10),
   clientUrl: process.env.CLIENT_URL!,
+  allowedOrigins: parseOrigins(process.env.CLIENT_URL!),
   mongodbUri: process.env.MONGODB_URI!,
   databaseName: process.env.DATABASE_NAME!,
   betterAuthSecret: process.env.BETTER_AUTH_SECRET!,
