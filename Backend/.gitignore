@@ -4,3 +4,6 @@ dist/
 *.log
 .DS_Store
 Thumbs.db
+
+# Vercel bundling output
+api/entry.js

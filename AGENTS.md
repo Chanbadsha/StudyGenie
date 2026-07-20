@@ -36,6 +36,39 @@ npm run seed                    # tsx src/seed.ts — seed database
 - Backend connects to MongoDB before listening; exits on failure. Health: `GET /api/v1/health`.
 - Backend uses **in-memory** rate limiting (`Backend/src/middlewares/rate-limit.middleware.ts`) and response caching (`Backend/src/middlewares/cache.middleware.ts`). No Redis. Cache and rate-limit state are per-process and lost on restart.
 
+## Deploy
+
+### Frontend (Vercel)
+
+`Frontend/vercel.json` exists — Vercel auto-detects Next.js. Deploy from the Vercel dashboard linked to the repo, or via CLI from `Frontend/`:
+
+```text
+vercel --prod
+```
+
+Set `NEXT_PUBLIC_API_URL` to the deployed backend URL in the Vercel dashboard.
+
+### Backend (Vercel)
+
+Key files:
+
+```text
+Backend/
+├── src/
+│   └── vercel-handler.ts  # Bundle entrypoint (connects DB, exports handler)
+├── scripts/
+│   └── build-vercel.mjs   # Bundles everything with esbuild → api/entry.js
+├── vercel.json            # Build command + routes all requests → /api/entry
+```
+
+- `vercel.json` runs `npm run build && node scripts/build-vercel.mjs` as build command. The script bundles `src/vercel-handler.ts` and ALL dependencies (including ESM-only packages like `better-auth`) into a single CJS file at `api/entry.js` via esbuild. This avoids CJS/ESM interop issues.
+- Deploy from the Vercel dashboard with **Root Directory** set to `Backend/`.
+- `api/entry.js` is gitignored — always rebuild locally before deploying.
+- **Set all env vars** from `Backend/.env.example` in the Vercel dashboard. `BETTER_AUTH_URL` must match the deployed backend URL (e.g. `https://studygenie-api.vercel.app`). `CLIENT_URL` must match the frontend URL.
+- **In-memory** rate limiting & cache are per-serverless-instance and reset between cold starts. Not suitable for production at scale.
+- Better Auth uses `mongoose.connection.db` — `vercel-handler.ts` connects MongoDB on first request (cached across warm starts).
+- Adding server-only logic: update source files in `src/`, then rebuild with `node scripts/build-vercel.mjs` before deploy.
+
 ## Environment
 
 - Create `Backend/.env` from `Backend/.env.example`. Required at startup: `PORT`, `CLIENT_URL`, `MONGODB_URI`, `DATABASE_NAME`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GEMINI_API_KEY`.
