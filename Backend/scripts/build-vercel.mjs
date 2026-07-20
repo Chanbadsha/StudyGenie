@@ -9,7 +9,7 @@ await esbuild.build({
   bundle: true,
   platform: 'node',
   target: 'node18',
-  outfile: path.join(__dirname, '..', 'api', 'entry.js'),
+  outfile: path.join(__dirname, '..', 'api', 'entry.bundle.js'),
   format: 'cjs',
   external: [],
   loader: {
