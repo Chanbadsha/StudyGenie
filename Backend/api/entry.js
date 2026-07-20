@@ -1,0 +1,1 @@
+// Placeholder — overwritten by build script during Vercel deployment
